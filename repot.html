@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>從田徑場到演算法：主動思考的力量</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdfbf7; color: #3d3d3d; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-active { border-bottom: 2px solid #5a67d8; color: #5a67d8; }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 1rem; }
+        .report-figure { position: relative; }
+        .report-figure img { width: 100%; height: auto; border-radius: 0.75rem; object-fit: cover; }
+        .report-figure img.is-loaded { display: block; }
+        .report-figure .img-placeholder {
+            min-height: 12rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 2px dashed #c7d2fe; border-radius: 0.75rem; background: #eef2ff;
+            color: #6366f1; font-size: 0.875rem; text-align: center; padding: 1rem;
+        }
+        .report-figure img.is-loaded + .img-placeholder { display: none; }
+        .img-toolbar {
+            display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; justify-content: center;
+        }
+        .img-btn {
+            font-size: 0.75rem; padding: 0.35rem 0.75rem; border-radius: 9999px;
+            background: #e0e7ff; color: #4338ca; cursor: pointer; border: none;
+        }
+        .img-btn:hover { background: #c7d2fe; }
+        .img-btn-secondary { background: #f3f4f6; color: #4b5563; }
+        .img-btn-secondary:hover { background: #e5e7eb; }
+
+        /* 上台展示：全寬置中、每節垂直置中、大字級 */
+        body.presentation-mode {
+            font-size: 1.5rem;
+            line-height: 1.8;
+        }
+        body.presentation-mode nav > div,
+        body.presentation-mode main {
+            width: 100%;
+            max-width: none;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: clamp(1.5rem, 5vw, 4rem);
+            padding-right: clamp(1.5rem, 5vw, 4rem);
+        }
+        body.presentation-mode header.fade-in,
+        body.presentation-mode section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: calc(100dvh - 5.5rem);
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+            scroll-margin-top: 5.5rem;
+            box-sizing: border-box;
+        }
+        body.presentation-mode header.fade-in > *,
+        body.presentation-mode section > * {
+            width: 100%;
+            max-width: min(92vw, 88rem);
+            margin-left: auto;
+            margin-right: auto;
+        }
+        body.presentation-mode section#workshop {
+            justify-content: flex-start;
+            min-height: auto;
+            padding-top: 5rem;
+            padding-bottom: 5rem;
+        }
+        body.presentation-mode .max-w-2xl,
+        body.presentation-mode .max-w-3xl,
+        body.presentation-mode .max-w-4xl {
+            max-width: min(88vw, 80rem) !important;
+        }
+        body.presentation-mode p,
+        body.presentation-mode li,
+        body.presentation-mode label {
+            font-size: 1.55rem;
+            line-height: 1.8;
+        }
+        body.presentation-mode h1 {
+            font-size: clamp(3rem, 6vw, 4.75rem);
+            line-height: 1.15;
+        }
+        body.presentation-mode h2 {
+            font-size: clamp(2.25rem, 4.5vw, 3.35rem);
+            line-height: 1.2;
+        }
+        body.presentation-mode h3 {
+            font-size: clamp(1.75rem, 3vw, 2.35rem);
+        }
+        body.presentation-mode h4 {
+            font-size: 1.65rem;
+        }
+        body.presentation-mode .text-sm,
+        body.presentation-mode footer .text-sm {
+            font-size: 1.2rem !important;
+        }
+        body.presentation-mode .text-xs {
+            font-size: 1.05rem !important;
+        }
+        body.presentation-mode .text-lg {
+            font-size: 1.55rem !important;
+        }
+        body.presentation-mode .text-2xl { font-size: 3rem !important; }
+        body.presentation-mode .text-3xl { font-size: 3.5rem !important; }
+        body.presentation-mode .text-4xl { font-size: 4rem !important; }
+        body.presentation-mode .text-5xl { font-size: 4.75rem !important; }
+        body.presentation-mode .chart-container {
+            height: min(42vh, 520px);
+            max-height: 560px;
+            max-width: min(88vw, 820px);
+            margin-left: auto;
+            margin-right: auto;
+        }
+        body.presentation-mode #intro .glass-card {
+            width: 100%;
+        }
+        body.presentation-mode #intro .intro-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+        @media (min-width: 900px) {
+            body.presentation-mode #intro .intro-grid {
+                grid-template-columns: 1fr 1.15fr;
+            }
+        }
+        body.presentation-mode #intro .report-figure img {
+            max-height: min(50vh, 520px);
+            width: 100%;
+            object-fit: cover;
+        }
+        body.presentation-mode .glass-card,
+        body.presentation-mode section .rounded-3xl {
+            padding: 2.5rem 2.75rem;
+        }
+        body.presentation-mode nav .font-bold.text-xl {
+            font-size: 1.75rem;
+        }
+        body.presentation-mode nav button {
+            font-size: 1.15rem;
+            padding: 0.5rem 0.25rem;
+        }
+        body.presentation-mode nav button.bg-indigo-600 {
+            padding: 0.6rem 1.25rem;
+        }
+        body.presentation-mode button.bg-indigo-600,
+        body.presentation-mode button.border {
+            font-size: 1.25rem;
+            padding: 0.85rem 2rem;
+        }
+        body.presentation-mode textarea {
+            font-size: 1.25rem;
+            min-height: 10rem;
+            padding: 1.25rem;
+        }
+        body.presentation-mode .bg-amber-50 p,
+        body.presentation-mode .bg-gray-900 p {
+            font-size: 1.45rem !important;
+        }
+        body.presentation-mode .bg-gray-900 .text-2xl {
+            font-size: 2rem !important;
+        }
+        body.presentation-mode section h2 > span.rounded-full {
+            width: 2.75rem;
+            height: 2.75rem;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        body.presentation-mode .report-figure .img-placeholder {
+            min-height: 16rem;
+            font-size: 1.15rem;
+        }
+        body.presentation-mode footer {
+            min-height: calc(100dvh - 5.5rem);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            width: 100%;
+            max-width: none;
+        }
+        body.presentation-mode footer > * {
+            max-width: min(92vw, 88rem);
+        }
+        body.presentation-mode footer h2 {
+            font-size: 3rem;
+        }
+        #workshop-timer {
+            background: linear-gradient(180deg, #eef2ff 0%, #fff 100%);
+            border: 2px solid #c7d2fe;
+            border-radius: 1.25rem;
+            padding: 2rem 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+        #timer-display {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.05em;
+        }
+        body.presentation-mode #timer-display {
+            font-size: clamp(4rem, 14vw, 8rem);
+            line-height: 1;
+        }
+        #workshop-timer.timer-warning #timer-display { color: #d97706; }
+        #workshop-timer.timer-done #timer-display { color: #dc2626; }
+        #workshop-timer.timer-done { border-color: #fca5a5; background: #fef2f2; }
+        .intro-contact {
+            width: 100%;
+            margin-top: 2rem;
+            padding-top: 1.75rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2.5rem 4rem;
+        }
+        @media (min-width: 640px) {
+            .intro-contact { justify-content: space-around; }
+        }
+        .contact-icon-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: #4338ca;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .contact-icon-link:hover {
+            transform: scale(1.06);
+            opacity: 0.85;
+        }
+        .contact-icon-link img {
+            height: 3.25rem;
+            width: auto;
+            display: block;
+        }
+        body.presentation-mode .contact-icon-link img {
+            height: 4.5rem;
+        }
+        .contact-icon-link .contact-label {
+            font-size: 0.95rem;
+            color: #4b5563;
+            text-align: center;
+            max-width: 14rem;
+            word-break: break-word;
+        }
+        body.presentation-mode .contact-icon-link .contact-label {
+            font-size: 1.15rem;
+        }
+        .workshop-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+        @media (min-width: 900px) {
+            .workshop-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .workshop-cell {
+            display: flex;
+            flex-direction: column;
+            min-height: 14rem;
+            padding: 1.25rem 1.35rem;
+            border: 2px solid #e0e7ff;
+            border-radius: 1rem;
+            background: #fff;
+        }
+        .workshop-cell:focus-within {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        .workshop-cell--pros { border-top: 4px solid #4ade80; }
+        .workshop-cell--cons { border-top: 4px solid #f87171; }
+        .workshop-cell--target { border-top: 4px solid #818cf8; }
+        .workshop-cell textarea {
+            flex: 1;
+            min-height: 8rem;
+            margin-top: 0.5rem;
+        }
+        body.presentation-mode .workshop-cell {
+            min-height: 18rem;
+            padding: 1.5rem;
+        }
+        body.presentation-mode .workshop-cell textarea {
+            min-height: 10rem;
+        }
+        .university-media {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            margin-top: 2rem;
+            align-items: start;
+        }
+        @media (min-width: 768px) {
+            .university-media { grid-template-columns: 1fr 1fr; }
+        }
+        .university-media-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: #111;
+        }
+        .university-media-frame img,
+        .university-media-frame video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+        .university-media-frame--photo img {
+            object-position: center 35%;
+        }
+        body.presentation-mode .university-media-frame {
+            max-height: min(42vh, 28rem);
+        }
+        @supports (height: 1dvb) {
+            body.presentation-mode .university-media-frame {
+                max-height: min(42dvh, 28rem);
+            }
+        }
+        .career-media {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            margin-top: 2.5rem;
+            width: 100%;
+        }
+        @media (min-width: 900px) {
+            .career-media { grid-template-columns: repeat(3, 1fr); }
+        }
+        .career-media img {
+            width: 100%;
+            border-radius: 0.75rem;
+            object-fit: cover;
+            background: #f3f4f6;
+            max-height: 20rem;
+        }
+        body.presentation-mode .career-media img {
+            max-height: min(38vh, 26rem);
+        }
+    </style>
+</head>
+<body class="presentation-mode">
+
+<!-- Chosen Palette: 溫潤大地感 (Warm Neutrals & Serene Blue) -->
+<!-- 圖片使用方式：
+     個人照固定：images/IMG_2287.JPG
+     固定圖：個人照 IMG_2287.JPG、Oral Oral.jpg；其餘媒體見 HTML
+-->
+
+<nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md shadow-sm z-50">
+    <div class="w-full mx-auto py-5 flex justify-between items-center">
+        <span class="font-bold text-xl tracking-tight text-indigo-700">思考的力量</span>
+        <div class="hidden md:flex space-x-6 text-sm font-medium">
+            <button onclick="scrollToSection('intro')" class="nav-link py-1 hover:text-indigo-600 transition">關於我</button>
+            <button onclick="scrollToSection('university')" class="nav-link py-1 hover:text-indigo-600 transition">大學：韌性</button>
+            <button onclick="scrollToSection('grad')" class="nav-link py-1 hover:text-indigo-600 transition">研究所：環境</button>
+            <button onclick="scrollToSection('career')" class="nav-link py-1 hover:text-indigo-600 transition">職場：爭取</button>
+            <button onclick="scrollToSection('workshop')" class="nav-link py-1 bg-indigo-600 text-white px-4 rounded-full">主動思考工作坊</button>
+        </div>
+    </div>
+</nav>
+
+<main class="w-full mx-auto pt-28 pb-24">
+
+    <header class="text-center py-16 fade-in">
+        <p class="text-sm font-medium text-indigo-600 mb-3 tracking-wide">北市大經驗分享 · 主軸：主動思考</p>
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">找自己的麻煩，<br><span class="text-indigo-600">麻煩才不會來找你</span></h1>
+        <p class="text-lg text-gray-600 max-w-4xl mx-auto mb-8 leading-relaxed">
+            從田徑場上的風吹日曬，到科技業演算法與運動測試數據——分享大學、研究所與初入職場的轉折。在 AI 很方便的時代，為什麼仍要守住「自己到底需要什麼」的思考？
+        </p>
+        <div class="flex justify-center flex-wrap gap-4">
+            <button onclick="scrollToSection('intro')" class="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition shadow-lg">認識講者</button>
+            <button onclick="scrollToSection('university')" class="bg-white border border-indigo-200 text-indigo-700 px-8 py-3 rounded-lg hover:bg-indigo-50 transition">進入故事</button>
+        </div>
+    </header>
+
+    <!-- 個人介紹（新增） -->
+    <section id="intro" class="border-t border-gray-100 fade-in">
+        <div class="glass-card p-8 md:p-12 shadow-sm w-full">
+            <div class="intro-grid">
+                <div class="w-full">
+                    <figure class="report-figure report-figure--fixed">
+                        <img id="img-intro" src="images/IMG_2287.JPG" alt="黃暉銘" class="mx-auto shadow-md w-full is-loaded" />
+                    </figure>
+                </div>
+                <div class="w-full">
+                    <h2 class="text-2xl font-bold mb-3 text-gray-900">黃暉銘</h2>
+                    <ul class="space-y-4 text-gray-600 leading-relaxed">
+                        <li><span class="font-semibold text-gray-800">學歷：</span>北市大陸上運動學系；運動健康科學系（雙主修）。進修運動健康科學所並順利畢業。</li>
+                        <li><span class="font-semibold text-gray-800">專項背景：</span>田徑（跨欄），大學期間認真訓練；成績卻長期停滯，因而盤點資源、選擇升學。</li>
+                        <li><span class="font-semibold text-gray-800">現職：</span>GoMore 博晶醫電（科技業醫電）— 演算法設計、運動測試數據採集。</li>
+                    </ul>
+                    <p class="mt-6 text-gray-600 leading-relaxed border-l-4 border-indigo-300 pl-4">
+                        今天依序談<strong>大學、研究所、職場</strong>；全程主軸為<strong>「主動思考」</strong>。歡迎隨時舉手互動——我不是什麼大演講者，只是一個回來分享的學長。
+                    </p>
+                </div>
+            </div>
+            <div class="intro-contact">
+                <a id="contact-instagram" class="contact-icon-link" href="https://www.instagram.com/h.ansel_?igsh=MW9zNDhvcDRsemVo&utm_source=qr" target="_blank" rel="noopener noreferrer">
+                    <img src="images/icon-instagram.png" width="72" height="72" alt="Instagram">
+                    <span class="contact-label">@h.asnel_</span>
+                </a>
+                <a id="contact-linkedin" class="contact-icon-link" href="https://www.linkedin.com/in/ansel-hunag-aba33b289?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer">
+                    <img src="images/icon-linkedin.png" width="72" height="72" alt="LinkedIn">
+                    <span class="contact-label">Ansel Huang</span>
+                </a>
+                <a id="contact-email" class="contact-icon-link" href="mailto:hanselfuture@gmail.com">
+                    <img src="images/icon-email.png" width="72" height="72" alt="信箱">
+                    <span class="contact-label">hanselfuture@gmail.com</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 1: University -->
+    <section id="university" class="border-t border-gray-100">
+        <div class="grid md:grid-cols-2 gap-12 items-center w-full">
+            <div>
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">01</span>
+                    大學：運動員的必修課
+                </h2>
+                <p class="text-gray-600 mb-4 leading-relaxed">
+                    多數人進校都抱著「我要最強」。我也是：不只完成課表，還揪晨練；缺敏捷就練繩梯、缺體能就跑K、缺爆發就踢瑜珈球。常駐田徑隊中最晚離開的那群，因為除了既定課表，還會加練一些天馬行空的想法。
+                </p>
+                <p class="text-gray-600 mb-4 leading-relaxed">
+                    但<strong>事事未必如意</strong>——大一到大三很認真，成績卻幾乎沒進步。高年級開始想：出社會還是升學？盤點後發現運健雙主修和對欄架技術分析的熱情是優勢；大四上以田徑相關研究參加甄試（與運健僅擦邊），仍以正取二進碩班。
+                </p>
+                <p class="text-gray-600 mb-4 leading-relaxed text-sm">
+                    <strong>不是要放棄專項。</strong> 把專訓當人生的必修課，認真修完；主動利用時間，靜下來想想未來。成績停滯不代表這四年白費。
+                </p>
+                <div class="bg-amber-50 p-6 rounded-xl border-l-4 border-amber-400 mb-4">
+                    <p class="text-amber-800 italic font-medium">「運動員最大的收穫，往往不是獎牌，而是在嚴苛環境下，仍持續把自己推得更好——那股韌性。」</p>
+                </div>
+                <p class="text-gray-600">這份韌性，成為日後職場面對挑戰的底氣。</p>
+            </div>
+            <div class="glass-card p-6 shadow-sm">
+                <h3 class="text-center font-bold text-gray-700 mb-4">訓練投入 vs. 成績表現 (心理模型)</h3>
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+                <p class="text-xs text-gray-400 mt-4 text-center">※ 個人經驗模擬：表面成績可能平台化，努力與韌性仍持續累積。</p>
+            </div>
+        </div>
+        <div class="university-media w-full">
+            <div class="university-media-cell">
+                <div class="university-media-frame university-media-frame--photo shadow-md">
+                    <img src="images/20092.jpg" alt="大學跨欄訓練" />
+                </div>
+            </div>
+            <div class="university-media-cell">
+                <div class="university-media-frame shadow-md">
+                    <video controls playsinline preload="metadata">
+                        <source src="videos/Training.mp4" type="video/mp4" />
+                        您的瀏覽器不支援影片播放。
+                    </video>
+                </div>
+                <p class="text-xs text-gray-400 text-center mt-2">大學訓練紀錄</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Grad School -->
+    <section id="grad" class="bg-white rounded-3xl px-8 md:px-12 shadow-sm">
+        <div class="w-full mx-auto">
+            <h2 class="text-2xl font-bold mb-6 text-center">研究所：環境比頭銜重要</h2>
+            <p class="text-gray-600 mb-4 text-center leading-relaxed">
+                「研究生」未必有優越感——常只是晚兩年出社會。帶給我價值的是<strong>高知識密度的環境</strong>：向有底蘊的前輩「偷」知識，為畢業也被迫進步。
+            </p>
+            <p class="text-gray-600 mb-8 text-center text-sm">
+                讀碩代價：同儕已工作、薪水與焦慮感。讀碩好處：視野、底蘊、耐性——<em>Results take time, and time requires patience.</em>
+            </p>
+
+            <figure class="report-figure report-figure--fixed max-w-3xl mx-auto mb-10">
+                <img src="images/Oral.jpg" alt="英國 Glasgow Oral 簡報" class="w-full rounded-xl shadow-md max-h-[min(50vh,32rem)] object-cover mx-auto" />
+            </figure>
+
+            <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl mb-10">
+                <h3 class="font-bold text-indigo-900 mb-2">🎤 出國 Oral（Glasgow）</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    國際學分需 Oral，與三位同學、老師赴英國報告：15 分鐘全英文、現場 Chairman、開放入場。背稿練了幾十遍，正式上場卻把 “but” 講成「但是」——蠢，但會記一輩子。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="p-5 bg-indigo-50 rounded-2xl text-center">
+                    <div class="text-2xl mb-2">🌍</div>
+                    <h4 class="font-bold mb-1">視野拓展</h4>
+                    <p class="text-sm text-gray-500">觸及原本知識範圍外，理解事情如何運作。</p>
+                </div>
+                <div class="p-5 bg-indigo-50 rounded-2xl text-center">
+                    <div class="text-2xl mb-2">💎</div>
+                    <h4 class="font-bold mb-1">底蘊累積</h4>
+                    <p class="text-sm text-gray-500">向教授與前輩汲取長年專業累積。</p>
+                </div>
+                <div class="p-5 bg-indigo-50 rounded-2xl text-center">
+                    <div class="text-2xl mb-2">⏳</div>
+                    <h4 class="font-bold mb-1">耐性培養</h4>
+                    <p class="text-sm text-gray-500">在「原地踏步」感中仍往前走。</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 text-white p-8 rounded-2xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold mb-4 text-indigo-300">💡 核心金句</h3>
+                    <p class="text-2xl font-light italic leading-snug">「即使期待的結果沒成真，過程本身也可以是很好的回憶。」</p>
+                </div>
+                <div class="absolute right-[-20px] bottom-[-20px] text-9xl opacity-10 font-serif">“</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Workshop -->
+    <section id="workshop">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">主動思考工作坊</h2>
+            <!-- 
+                如何在 HTML 裡面換行？
+                方法 1：用 <br> 標籤。例如：換行內容<br>下一行內容
+                方法 2：用多個區塊元素（如 <p>）包裹不同段落。
+                方法 3：可用 CSS 控制 white-space，但最簡單還是插入 <br>
+            -->
+            <p class="text-gray-600"> 10 分鐘的白紙練習：目標、優勢、缺口。<strong>沒有標準答案</strong>，重點是你有沒有想過。</p>
+ 
+        </div>
+
+        <div id="workshop-timer" class="w-full max-w-4xl mx-auto mb-10">
+            <p class="text-center text-gray-600 font-medium mb-2">Time to think!</p>
+            <div id="timer-display" class="text-6xl font-bold text-center text-indigo-700">10:00</div>
+            <p id="timer-status" class="hidden text-center text-red-600 font-bold mt-3 text-xl">時間到！可以開始分享或進入下一步</p>
+            <div class="flex flex-wrap justify-center gap-3 mt-6">
+                <button type="button" onclick="startWorkshopTimer()" class="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium">開始</button>
+                <button type="button" onclick="pauseWorkshopTimer()" class="bg-gray-200 text-gray-800 px-8 py-3 rounded-lg hover:bg-gray-300 font-medium">暫停</button>
+                <button type="button" onclick="resetWorkshopTimer()" class="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 font-medium">重設 10:00</button>
+            </div>
+        </div>
+
+        <div class="w-full max-w-[min(92vw,88rem)] mx-auto glass-card p-8 md:p-10 shadow-xl border-indigo-100">
+            <div id="workshop-form" class="workshop-grid">
+                <div class="workshop-cell workshop-cell--target">
+                    <label for="target" class="block text-lg font-semibold text-gray-800">1. 你現在想做什麼？目標是什麼？</label>
+                    <p class="text-sm text-gray-500 mt-1 mb-2">不限學校，可以是任何你渴望的事。</p>
+                    <textarea id="target" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition resize-y" placeholder="例如：成為某領域專家、讀運健碩班、精進專項…"></textarea>
+                </div>
+                <div class="workshop-cell workshop-cell--pros">
+                    <label for="pros" class="block text-lg font-semibold text-gray-800">2. 達成目標，你擁有的優勢？</label>
+                    <p class="text-sm text-gray-500 mt-1 mb-2">列出你的現有資源、天賦或過往累積。</p>
+                    <textarea id="pros" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition resize-y" placeholder="雙主修、專項底子、人脈、過往累積…"></textarea>
+                </div>
+                <div class="workshop-cell workshop-cell--cons">
+                    <label for="cons" class="block text-lg font-semibold text-gray-800">3. 你目前缺乏的是什麼？</label>
+                    <p class="text-sm text-gray-500 mt-1 mb-2">誠實面對你的技術缺口、心態瓶頸。</p>
+                    <textarea id="cons" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition resize-y" placeholder="知識、技能、表達、心態…"></textarea>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <!-- <button type="button" onclick="generateSummary()" class="bg-indigo-600 text-white px-10 py-3 rounded-lg hover:bg-indigo-700 font-medium">完成分析</button>
+            </div> -->
+
+            <div id="summary-result" class="hidden mt-10">
+                <h3 class="text-xl font-bold text-indigo-700 mb-4">你的思考藍圖</h3>
+                <div class="bg-indigo-50 p-6 rounded-xl space-y-4">
+                    <div><span class="font-bold">目標：</span><span id="res-target"></span></div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border-t-4 border-green-400">
+                            <span class="font-bold text-green-700 block mb-2">優勢與武器：</span>
+                            <p id="res-pros" class="text-sm whitespace-pre-wrap"></p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border-t-4 border-red-400">
+                            <span class="font-bold text-red-700 block mb-2">待補足的缺口：</span>
+                            <p id="res-cons" class="text-sm whitespace-pre-wrap"></p>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm text-gray-500 italic text-center">答案漂不漂亮沒關係；剛才這段「主動思考」的過程，才是重點。</p>
+                <button onclick="resetWorkshop()" class="mt-4 text-indigo-600 underline text-sm block mx-auto">重新思考</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Career & AI -->
+    <section id="career" class="border-t border-gray-100">
+        <div class="flex flex-col md:flex-row gap-12 items-center w-full">
+            <div class="flex-1 order-2 md:order-1">
+                <div class="chart-container">
+                    <canvas id="skillChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-gray-400 mt-2">碩班畢業前自評：運動科學強、工程面弱 → 選需兩者交集的職位</p>
+            </div>
+            <div class="flex-1 order-1 md:order-2">
+                <h2 class="text-2xl font-bold mb-6">職場：主動爭取</h2>
+                <p class="text-gray-600 mb-4 leading-relaxed text-sm">
+                    <strong>大學→碩班：</strong> 有雙主修、生物力學與跨欄分析；缺運健系統知識與學術表達。<br>
+                    <strong>碩班→職場：</strong> 想當工程師；有運動分析與生理訊號能力；缺程式語言能力 → 進博晶醫電（約半年）。
+                </p>
+                <p class="text-gray-600 mb-4 leading-relaxed">
+                    職場不像學校：乖不一定有對等回饋。初期工作量不多，才發現自己太習慣<strong>等吩咐</strong>（教練課表、教授題目）。有人說：主管不派工，就自己找事做——<strong>沒爭取，就什麼都沒有</strong>。
+                </p>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-4 mt-1">🧠</div>
+                        <div>
+                            <h4 class="font-bold">主動思考 vs. AI 依賴</h4>
+                            <p class="text-sm text-gray-500">AI 答案可能更工整，但真的要學會一件事，「思考」省不了。工具可以用，目標與取捨要自己判斷。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-red-100 text-red-600 p-2 rounded-lg mr-4 mt-1">⚠️</div>
+                        <div>
+                            <h4 class="font-bold">思考退化的代價</h4>
+                            <p class="text-sm text-gray-500">抗拒思考，溝通容易只剩最表層；明明聰明，卻讓習慣成為絆腳石——那很可惜。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="career-media">
+            <figure class="m-0">
+                <img src="images/Q_meeting.jpeg" alt="職場季會" class="shadow-md" loading="lazy" />
+            </figure>
+            <figure class="m-0">
+                <img src="images/Test_2.JPG" alt="運動測試設備" class="shadow-md" loading="lazy" />
+            </figure>
+            <figure class="m-0">
+                <img src="images/Vo2max_2.jpeg" alt="Vo₂max 測試" class="shadow-md" loading="lazy" />
+            </figure>
+        </div>
+    </section>
+
+    <footer class="text-center bg-gray-50 rounded-3xl mt-12 w-full">
+        <h2 class="text-3xl font-bold mb-4">找自己的麻煩</h2>
+        <p class="text-gray-500 max-w-xl mx-auto mb-8 leading-relaxed">
+            大學願意多練、多學，求職時能力就比較齊；興趣也一樣——今天多花時間的「麻煩」，事後常有意想不到的好處。別讓便利取代反思；你值得更好的自己。
+        </p>
+        <p class="text-indigo-600 font-medium">感謝你的聆聽與思考 · 黃暉銘</p>
+    </footer>
+
+</main>
+
+<script>
+    // —— 靜態圖片路徑（與 repot.html 同資料夾的相對路徑；留空則僅顯示上傳或 placeholder）——
+    const CONTACT_LINKS = {
+        email: { href: 'mailto:hanselfuture@gmail.com', label: 'hanselfuture@gmail.com' },
+        instagram: { href: 'https://www.instagram.com/h.ansel_?igsh=MW9zNDhvcDRsemVo&utm_source=qr', label: '@h.asnel_' },
+        linkedin: { href: 'https://www.linkedin.com/in/ansel-hunag-aba33b289?utm_source=share_via&utm_content=profile&utm_medium=member_ios', label: 'Ansel Huang' }
+    };
+
+    function applyContactLinks() {
+        [
+            ['contact-email', CONTACT_LINKS.email],
+            ['contact-instagram', CONTACT_LINKS.instagram],
+            ['contact-linkedin', CONTACT_LINKS.linkedin]
+        ].forEach(([id, data]) => {
+            const el = document.getElementById(id);
+            if (!el || !data) return;
+            el.href = data.href;
+            const label = el.querySelector('.contact-label');
+            if (label) label.textContent = data.label;
+        });
+    }
+
+    const INTRO_PHOTO_PATH = 'images/IMG_2287.JPG';
+
+    const UNIVERSITY_PHOTO_PATH = 'images/20092.jpg';
+    const UNIVERSITY_VIDEO_PATH = 'videos/Training.mp4';
+
+    const GRAD_ORAL_PHOTO_PATH = 'images/Oral.jpg';
+
+    const REPORT_IMAGE_PATHS = {};
+
+    const IMAGE_SLOTS = [];
+
+    const WORKSHOP_TIMER_SECONDS = 10 * 60;
+    let workshopTimerRemaining = WORKSHOP_TIMER_SECONDS;
+    let workshopTimerInterval = null;
+
+    function formatWorkshopTime(totalSeconds) {
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        return m + ':' + String(s).padStart(2, '0');
+    }
+
+    function updateWorkshopTimerDisplay() {
+        const display = document.getElementById('timer-display');
+        const box = document.getElementById('workshop-timer');
+        if (!display || !box) return;
+        display.textContent = formatWorkshopTime(workshopTimerRemaining);
+        box.classList.toggle('timer-warning', workshopTimerRemaining > 0 && workshopTimerRemaining <= 60);
+        if (workshopTimerRemaining <= 0) {
+            box.classList.add('timer-done');
+            box.classList.remove('timer-warning');
+            document.getElementById('timer-status')?.classList.remove('hidden');
+        } else {
+            box.classList.remove('timer-done');
+            document.getElementById('timer-status')?.classList.add('hidden');
+        }
+    }
+
+    function startWorkshopTimer() {
+        if (workshopTimerInterval || workshopTimerRemaining <= 0) return;
+        workshopTimerInterval = setInterval(function () {
+            if (workshopTimerRemaining <= 0) {
+                pauseWorkshopTimer();
+                return;
+            }
+            workshopTimerRemaining -= 1;
+            updateWorkshopTimerDisplay();
+            if (workshopTimerRemaining <= 0) pauseWorkshopTimer();
+        }, 1000);
+    }
+
+    function pauseWorkshopTimer() {
+        if (workshopTimerInterval) {
+            clearInterval(workshopTimerInterval);
+            workshopTimerInterval = null;
+        }
+    }
+
+    function resetWorkshopTimer() {
+        pauseWorkshopTimer();
+        workshopTimerRemaining = WORKSHOP_TIMER_SECONDS;
+        updateWorkshopTimerDisplay();
+    }
+    const STORAGE_PREFIX = 'report-image-';
+
+    function scrollToSection(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showImageForSlot(slot, src) {
+        const img = document.getElementById('img-' + slot);
+        const ph = document.getElementById('placeholder-' + slot);
+        if (!img) return;
+        img.onload = () => {
+            img.classList.remove('hidden');
+            img.classList.add('is-loaded');
+            if (ph) ph.style.display = 'none';
+        };
+        img.onerror = () => {
+            img.classList.add('hidden');
+            img.classList.remove('is-loaded');
+            if (ph) ph.style.display = '';
+        };
+        img.src = src;
+    }
+
+    function handleImageUpload(slot, input) {
+        if (slot === 'intro' || slot === 'university' || slot === 'grad') return;
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            try {
+                sessionStorage.setItem(STORAGE_PREFIX + slot, dataUrl);
+            } catch (err) {
+                console.warn('圖片太大，無法存入 sessionStorage', err);
+            }
+            showImageForSlot(slot, dataUrl);
+        };
+        reader.readAsDataURL(file);
+        input.value = '';
+    }
+
+    function clearImageSlot(slot) {
+        if (slot === 'intro') {
+            showImageForSlot('intro', INTRO_PHOTO_PATH);
+            return;
+        }
+        if (slot === 'university' || slot === 'grad') return;
+        sessionStorage.removeItem(STORAGE_PREFIX + slot);
+        const img = document.getElementById('img-' + slot);
+        const ph = document.getElementById('placeholder-' + slot);
+        if (img) {
+            img.removeAttribute('src');
+            img.classList.add('hidden');
+            img.classList.remove('is-loaded');
+        }
+        if (ph) ph.style.display = '';
+        const path = REPORT_IMAGE_PATHS[slot];
+        if (path) showImageForSlot(slot, path);
+    }
+
+    function initIntroPhoto() {
+        const img = document.getElementById('img-intro');
+        if (img) {
+            img.src = INTRO_PHOTO_PATH;
+            img.classList.remove('hidden');
+            img.classList.add('is-loaded');
+        }
+        sessionStorage.removeItem(STORAGE_PREFIX + 'intro');
+    }
+
+    function initGradOralPhoto() {
+        sessionStorage.removeItem(STORAGE_PREFIX + 'grad');
+    }
+
+    function initReportImages() {
+        initIntroPhoto();
+        initGradOralPhoto();
+        IMAGE_SLOTS.forEach(slot => {
+            const stored = sessionStorage.getItem(STORAGE_PREFIX + slot);
+            if (stored) {
+                showImageForSlot(slot, stored);
+                return;
+            }
+            const path = REPORT_IMAGE_PATHS[slot];
+            if (path) showImageForSlot(slot, path);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initReportImages);
+
+    const ctx1 = document.getElementById('growthChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: ['大一', '大二', '大三', '大四', '研究所', '職場'],
+            datasets: [
+                {
+                    label: '投入努力 (努力與韌性累積)',
+                    data: [60, 75, 85, 90, 95, 100],
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: '表面成績 (獎牌/外在回饋)',
+                    data: [40, 45, 45, 48, 55, 70],
+                    borderColor: '#fbbf24',
+                    borderDash: [5, 5],
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 14, font: { size: 16 } } }
+            },
+            scales: {
+                y: { display: false },
+                x: { ticks: { font: { size: 15 } } }
+            }
+        }
+    });
+
+    const ctx2 = document.getElementById('skillChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'radar',
+        data: {
+            labels: ['運動力學', '生理訊號', '工程 Coding', '資料結構', '主動思考', '堅韌精神'],
+            datasets: [{
+                label: '轉職工程師能力分佈',
+                data: [95, 90, 40, 35, 95, 100],
+                backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                borderColor: '#4f46e5',
+                pointBackgroundColor: '#4f46e5'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                r: {
+                    angleLines: { display: true },
+                    suggestedMin: 0,
+                    suggestedMax: 100,
+                    ticks: { display: false },
+                    pointLabels: { font: { size: 15 } }
+                }
+            }
+        }
+    });
+
+    function generateSummary() {
+        const target = document.getElementById('target').value.trim();
+        const pros = document.getElementById('pros').value;
+        const cons = document.getElementById('cons').value;
+        if (!target) { alert('請填寫你的目標'); return; }
+        document.getElementById('res-target').innerText = target;
+        document.getElementById('res-pros').innerText = pros || '未填寫';
+        document.getElementById('res-cons').innerText = cons || '未填寫';
+        document.getElementById('summary-result').classList.remove('hidden');
+        document.getElementById('summary-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function resetWorkshop() {
+        document.getElementById('target').value = '';
+        document.getElementById('pros').value = '';
+        document.getElementById('cons').value = '';
+        document.getElementById('summary-result').classList.add('hidden');
+        resetWorkshopTimer();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        applyContactLinks();
+        updateWorkshopTimerDisplay();
+    });
+</script>
+
+</body>
+</html>
