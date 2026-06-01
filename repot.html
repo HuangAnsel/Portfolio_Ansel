@@ -185,17 +185,213 @@
             min-height: calc(100dvh - 5.5rem);
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: stretch;
             justify-content: center;
-            padding: 4rem 2rem;
+            padding: 3rem clamp(0.5rem, 1.5vw, 1.25rem);
             width: 100%;
             max-width: none;
+            scroll-margin-top: 5.5rem;
         }
-        body.presentation-mode footer > * {
-            max-width: min(92vw, 88rem);
+        body.presentation-mode footer > .closing-slide-wrap {
+            max-width: none;
+            width: 100%;
         }
         body.presentation-mode footer h2 {
             font-size: 3rem;
+        }
+        .career-slide-nav {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            width: 100%;
+        }
+        .career-next-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1.5rem 0.85rem 1.25rem;
+            border: 2px solid #c7d2fe;
+            border-radius: 9999px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .career-next-btn:hover {
+            background: #e0e7ff;
+            border-color: #a5b4fc;
+            transform: translateX(4px);
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.2);
+        }
+        .career-next-btn:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 3px;
+        }
+        .career-next-btn__arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #fff;
+            font-size: 1.35rem;
+            line-height: 1;
+            transition: transform 0.15s ease;
+        }
+        .career-next-btn:hover .career-next-btn__arrow {
+            transform: translateX(3px);
+        }
+        body.presentation-mode .career-next-btn {
+            font-size: 1.35rem;
+            padding: 1rem 1.75rem 1rem 1.5rem;
+        }
+        body.presentation-mode .career-next-btn__arrow {
+            width: 2.75rem;
+            height: 2.75rem;
+            font-size: 1.6rem;
+        }
+        #closing {
+            position: relative;
+        }
+        .closing-slide-wrap {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+        .closing-slide-viewport {
+            overflow: hidden;
+            width: 100%;
+        }
+        .closing-slide-track {
+            display: flex;
+            width: 200%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+        .closing-slide-track[data-index="1"] {
+            transform: translateX(-50%);
+        }
+        .closing-slide-panel {
+            flex: 0 0 50%;
+            width: 50%;
+            box-sizing: border-box;
+            padding: 1.5rem clamp(2rem, 6vw, 5rem);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: min(78vh, 780px);
+        }
+        .closing-insights-stack {
+            width: 100%;
+            max-width: min(56rem, 94%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.75rem;
+        }
+        .insight-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+        .insight-card__icon {
+            font-size: 2.25rem;
+            line-height: 1;
+            padding: 1rem 1.15rem;
+            border-radius: 1rem;
+        }
+        .insight-card h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .insight-card p {
+            font-size: 1.1rem;
+            line-height: 1.75;
+            color: #6b7280;
+            max-width: min(52rem, 100%);
+        }
+        body.presentation-mode .insight-card__icon {
+            font-size: 3rem;
+            padding: 1.25rem 1.4rem;
+        }
+        body.presentation-mode .insight-card h4 {
+            font-size: 2.1rem;
+        }
+        body.presentation-mode .insight-card p {
+            font-size: 1.45rem;
+            line-height: 1.8;
+        }
+        body.presentation-mode .closing-insights-stack {
+            gap: 3.5rem;
+            max-width: min(68rem, 96%);
+        }
+        .closing-slide-panel--outro {
+            text-align: center;
+        }
+        .closing-slide-panel--outro .closing-outro-body {
+            max-width: min(52rem, 92%);
+            margin-left: auto;
+            margin-right: auto;
+        }
+        body.presentation-mode .closing-slide-panel--outro .closing-outro-body {
+            max-width: min(62rem, 94%);
+        }
+        .closing-slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border: none;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #fff;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+            transition: transform 0.15s ease, background 0.15s ease, opacity 0.2s ease;
+        }
+        .closing-slide-arrow:hover {
+            background: #4338ca;
+            transform: translateY(-50%) scale(1.06);
+        }
+        .closing-slide-arrow:focus-visible {
+            outline: 2px solid #312e81;
+            outline-offset: 3px;
+        }
+        .closing-slide-arrow--next {
+            right: clamp(0.5rem, 1.5vw, 1.25rem);
+        }
+        .closing-slide-arrow--prev {
+            left: clamp(0.5rem, 1.5vw, 1.25rem);
+        }
+        .closing-slide-arrow.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.presentation-mode .closing-slide-arrow {
+            width: 3.75rem;
+            height: 3.75rem;
+            font-size: 1.85rem;
+        }
+        body.presentation-mode .closing-slide-panel {
+            min-height: min(82vh, 860px);
+            padding-left: clamp(2.5rem, 8vw, 6rem);
+            padding-right: clamp(2.5rem, 8vw, 6rem);
         }
         #workshop-timer {
             background: linear-gradient(180deg, #eef2ff 0%, #fff 100%);
@@ -256,6 +452,11 @@
             text-align: center;
             max-width: 14rem;
             word-break: break-word;
+        }
+        #contact-email .contact-label {
+            max-width: none;
+            white-space: nowrap;
+            word-break: normal;
         }
         body.presentation-mode .contact-icon-link .contact-label {
             font-size: 1.15rem;
@@ -381,7 +582,7 @@
 <main class="w-full mx-auto pt-28 pb-24">
 
     <header class="text-center py-16 fade-in">
-        <p class="text-sm font-medium text-indigo-600 mb-3 tracking-wide">北市大經驗分享 · 主軸：主動思考</p>
+        <p class="text-sm font-medium text-indigo-600 mb-3 tracking-wide">陸上系經驗分享 · 主軸：主動思考</p>
         <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">找自己的麻煩，<br><span class="text-indigo-600">麻煩才不會來找你</span></h1>
         <p class="text-lg text-gray-600 max-w-4xl mx-auto mb-8 leading-relaxed">
             從田徑場上的風吹日曬，到科技業演算法與運動測試數據——分享大學、研究所與初入職場的轉折。在 AI 很方便的時代，為什麼仍要守住「自己到底需要什麼」的思考？
@@ -405,11 +606,11 @@
                     <h2 class="text-2xl font-bold mb-3 text-gray-900">黃暉銘</h2>
                     <ul class="space-y-4 text-gray-600 leading-relaxed">
                         <li><span class="font-semibold text-gray-800">學歷：</span>北市大陸上運動學系；運動健康科學系（雙主修）。進修運動健康科學所並順利畢業。</li>
-                        <li><span class="font-semibold text-gray-800">專項背景：</span>田徑（跨欄），大學期間認真訓練；成績卻長期停滯，因而盤點資源、選擇升學。</li>
+                        <li><span class="font-semibold text-gray-800">專項背景：</span>田徑（跨欄），大學期間認真訓練；成績卻停滯不前，因而盤點資源、選擇升學。</li>
                         <li><span class="font-semibold text-gray-800">現職：</span>GoMore 博晶醫電（科技業醫電）— 演算法設計、運動測試數據採集。</li>
                     </ul>
                     <p class="mt-6 text-gray-600 leading-relaxed border-l-4 border-indigo-300 pl-4">
-                        今天依序談<strong>大學、研究所、職場</strong>；全程主軸為<strong>「主動思考」</strong>。歡迎隨時舉手互動——我不是什麼大演講者，只是一個回來分享的學長。
+                        今天依序談<strong>大學、研究所、職場</strong>；全程主軸圍繞<strong>「主動思考」</strong>。歡迎隨時舉手互動——我不是什麼偉大演講者，只是一個回來分享的學長。
                     </p>
                 </div>
             </div>
@@ -422,9 +623,9 @@
                     <img src="images/icon-linkedin.png" width="72" height="72" alt="LinkedIn">
                     <span class="contact-label">Ansel Huang</span>
                 </a>
-                <a id="contact-email" class="contact-icon-link" href="mailto:hanselfuture@gmail.com">
+                <a id="contact-email" class="contact-icon-link" href="#" role="button" title="點擊複製 Email" aria-label="複製 Email">
                     <img src="images/icon-email.png" width="72" height="72" alt="信箱">
-                    <span class="contact-label">hanselfuture@gmail.com</span>
+                    <span class="contact-label">aminhuang900308@gmail.com</span>
                 </a>
             </div>
         </div>
@@ -439,25 +640,25 @@
                     大學：運動員的必修課
                 </h2>
                 <p class="text-gray-600 mb-4 leading-relaxed">
-                    多數人進校都抱著「我要最強」。我也是：不只完成課表，還揪晨練；缺敏捷就練繩梯、缺體能就跑K、缺爆發就踢瑜珈球。常駐田徑隊中最晚離開的那群，因為除了既定課表，還會加練一些天馬行空的想法。
+                    多數人進校都抱著「我要最強」。我也是：不只完成課表，還揪晨練；缺敏捷就練繩梯、缺體能就跑 K、缺爆發就踢彈力帶。常駐田徑隊中最晚離開的那群，因為除了既定課表，還會加練一些天馬行空的想法。
                 </p>
                 <p class="text-gray-600 mb-4 leading-relaxed">
-                    但<strong>事事未必如意</strong>——大一到大三很認真，成績卻幾乎沒進步。高年級開始想：出社會還是升學？盤點後發現運健雙主修和對欄架技術分析的熱情是優勢；大四上以田徑相關研究參加甄試（與運健僅擦邊），仍以正取二進碩班。
+                    但<strong>事事未必如意</strong>——大一到大三很認真，成績卻幾乎沒進步。四年級開始想：出社會還是升學？盤點後發現運健雙主修和對欄架技術分析的熱情是優勢；大四上以田徑相關研究參加甄試（與運健僅擦邊），仍以正取二進碩班。
                 </p>
                 <p class="text-gray-600 mb-4 leading-relaxed text-sm">
                     <strong>不是要放棄專項。</strong> 把專訓當人生的必修課，認真修完；主動利用時間，靜下來想想未來。成績停滯不代表這四年白費。
                 </p>
                 <div class="bg-amber-50 p-6 rounded-xl border-l-4 border-amber-400 mb-4">
-                    <p class="text-amber-800 italic font-medium">「運動員最大的收穫，往往不是獎牌，而是在嚴苛環境下，仍持續把自己推得更好——那股韌性。」</p>
+                    <p class="text-amber-800 italic font-medium">「運動員最大的收穫，往往不是獎牌，而是在嚴苛環境下，仍持續把自己推向極限——那股韌性。」</p>
                 </div>
-                <p class="text-gray-600">這份韌性，成為日後職場面對挑戰的底氣。</p>
+                <!-- <p class="text-gray-600">這份韌性，成為日後職場面對挑戰的底氣。</p> -->
             </div>
             <div class="glass-card p-6 shadow-sm">
-                <h3 class="text-center font-bold text-gray-700 mb-4">訓練投入 vs. 成績表現 (心理模型)</h3>
+                <h3 class="text-center font-bold text-gray-700 mb-4">韌性累積 vs. 成績表現 (心理模型)</h3>
                 <div class="chart-container">
                     <canvas id="growthChart"></canvas>
                 </div>
-                <p class="text-xs text-gray-400 mt-4 text-center">※ 個人經驗模擬：表面成績可能平台化，努力與韌性仍持續累積。</p>
+                <p class="text-xs text-gray-400 mt-4 text-center">※ 個人經驗模擬：表面成績可能平台化，韌性仍持續累積。</p>
             </div>
         </div>
         <div class="university-media w-full">
@@ -473,7 +674,7 @@
                         您的瀏覽器不支援影片播放。
                     </video>
                 </div>
-                <p class="text-xs text-gray-400 text-center mt-2">大學訓練紀錄</p>
+                <p class="text-xs text-gray-400 text-center mt-2"></p>
             </div>
         </div>
     </section>
@@ -481,9 +682,12 @@
     <!-- Section 2: Grad School -->
     <section id="grad" class="bg-white rounded-3xl px-8 md:px-12 shadow-sm">
         <div class="w-full mx-auto">
-            <h2 class="text-2xl font-bold mb-6 text-center">研究所：環境比頭銜重要</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center flex items-center justify-center">
+                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">02</span>
+                研究所：環境比頭銜重要
+            </h2>
             <p class="text-gray-600 mb-4 text-center leading-relaxed">
-                「研究生」未必有優越感——常只是晚兩年出社會。帶給我價值的是<strong>高知識密度的環境</strong>：向有底蘊的前輩「偷」知識，為畢業也被迫進步。
+                「研究生」未必有優越感——常只是晚兩年出社會。帶給我價值的是<strong>高知識密度的環境</strong>：向學識淵博的前輩「偷」知識，為畢業也被迫進步。
             </p>
             <p class="text-gray-600 mb-8 text-center text-sm">
                 讀碩代價：同儕已工作、薪水與焦慮感。讀碩好處：視野、底蘊、耐性——<em>Results take time, and time requires patience.</em>
@@ -494,9 +698,9 @@
             </figure>
 
             <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl mb-10">
-                <h3 class="font-bold text-indigo-900 mb-2">🎤 出國 Oral（Glasgow）</h3>
+                <h3 class="font-bold text-indigo-900 mb-2">🎤 出國 Oral presentation（Glasgow）</h3>
                 <p class="text-gray-600 text-sm leading-relaxed">
-                    國際學分需 Oral，與三位同學、老師赴英國報告：15 分鐘全英文、現場 Chairman、開放入場。背稿練了幾十遍，正式上場卻把 “but” 講成「但是」——蠢，但會記一輩子。
+                    國際學分需 Oral presentation，與兩位同學、老師赴英國報告：15 分鐘全英文、現場 Chairman、開放自由入場。背稿練了幾十遍，正式上場卻把 “but” 講成「但是」——蠢，但會記一輩子。
                 </p>
             </div>
 
@@ -521,7 +725,7 @@
             <div class="bg-gray-900 text-white p-8 rounded-2xl relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="text-xl font-bold mb-4 text-indigo-300">💡 核心金句</h3>
-                    <p class="text-2xl font-light italic leading-snug">「即使期待的結果沒成真，過程本身也可以是很好的回憶。」</p>
+                    <p class="text-2xl font-light italic leading-snug">「即使不如預期，僅需細品過程，收穫仍不同凡響。」</p>
                 </div>
                 <div class="absolute right-[-20px] bottom-[-20px] text-9xl opacity-10 font-serif">“</div>
             </div>
@@ -606,29 +810,22 @@
                 <p class="text-xs text-center text-gray-400 mt-2">碩班畢業前自評：運動科學強、工程面弱 → 選需兩者交集的職位</p>
             </div>
             <div class="flex-1 order-1 md:order-2">
-                <h2 class="text-2xl font-bold mb-6">職場：主動爭取</h2>
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">03</span>
+                    職場：主動爭取
+                </h2>
                 <p class="text-gray-600 mb-4 leading-relaxed text-sm">
-                    <strong>大學→碩班：</strong> 有雙主修、生物力學與跨欄分析；缺運健系統知識與學術表達。<br>
+                    <strong>大學→碩班：</strong> 具雙主修、跨欄技術分析身份及能力；缺運健系統知識與學術表達。<br>
                     <strong>碩班→職場：</strong> 想當工程師；有運動分析與生理訊號能力；缺程式語言能力 → 進博晶醫電（約半年）。
                 </p>
                 <p class="text-gray-600 mb-4 leading-relaxed">
-                    職場不像學校：乖不一定有對等回饋。初期工作量不多，才發現自己太習慣<strong>等吩咐</strong>（教練課表、教授題目）。有人說：主管不派工，就自己找事做——<strong>沒爭取，就什麼都沒有</strong>。
+                    職場不像學校：乖不一定有對等回饋。初期工作量不多，才發現自己太習慣<strong>等吩咐</strong>（教練課表、教授任務）。有人說：主管不派工，就自己找事做——<strong>沒爭取，就什麼都沒有</strong>。
                 </p>
-                <div class="space-y-4">
-                    <div class="flex items-start">
-                        <div class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-4 mt-1">🧠</div>
-                        <div>
-                            <h4 class="font-bold">主動思考 vs. AI 依賴</h4>
-                            <p class="text-sm text-gray-500">AI 答案可能更工整，但真的要學會一件事，「思考」省不了。工具可以用，目標與取捨要自己判斷。</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="bg-red-100 text-red-600 p-2 rounded-lg mr-4 mt-1">⚠️</div>
-                        <div>
-                            <h4 class="font-bold">思考退化的代價</h4>
-                            <p class="text-sm text-gray-500">抗拒思考，溝通容易只剩最表層；明明聰明，卻讓習慣成為絆腳石——那很可惜。</p>
-                        </div>
-                    </div>
+                <div class="career-slide-nav">
+                    <button type="button" class="career-next-btn" onclick="scrollToSection('closing')" aria-label="前往結語與主動思考">
+                        <span class="career-next-btn__text">主動思考與結語</span>
+                        <span class="career-next-btn__arrow" aria-hidden="true">→</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -645,12 +842,36 @@
         </div>
     </section>
 
-    <footer class="text-center bg-gray-50 rounded-3xl mt-12 w-full">
-        <h2 class="text-3xl font-bold mb-4">找自己的麻煩</h2>
-        <p class="text-gray-500 max-w-xl mx-auto mb-8 leading-relaxed">
-            大學願意多練、多學，求職時能力就比較齊；興趣也一樣——今天多花時間的「麻煩」，事後常有意想不到的好處。別讓便利取代反思；你值得更好的自己。
-        </p>
-        <p class="text-indigo-600 font-medium">感謝你的聆聽與思考 · 黃暉銘</p>
+    <footer id="closing" class="text-center bg-gray-50 rounded-3xl mt-12 w-full">
+        <div class="closing-slide-wrap">
+            <div class="closing-slide-viewport">
+                <div class="closing-slide-track" id="closingSlideTrack" data-index="0">
+                    <div class="closing-slide-panel" aria-label="主動思考重點">
+                        <div class="closing-insights-stack">
+                            <article class="insight-card">
+                                <div class="insight-card__icon bg-indigo-100 text-indigo-600" aria-hidden="true">🧠</div>
+                                <h4>主動思考 vs. AI 依賴</h4>
+                                <p>AI 答案可能更工整，但真的要學會一件事，「思考」省不了。工具可以用，目標與取捨要自己判斷。</p>
+                            </article>
+                            <article class="insight-card">
+                                <div class="insight-card__icon bg-red-100 text-red-600" aria-hidden="true">⚠️</div>
+                                <h4>思考退化的代價</h4>
+                                <p>抗拒思考，溝通容易只剩最表層；明明聰穎，卻讓習慣成為絆腳石——屬實可惜。</p>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="closing-slide-panel closing-slide-panel--outro" aria-label="結語">
+                        <h2 class="text-3xl font-bold mb-4">找自己的麻煩</h2>
+                        <p class="closing-outro-body text-gray-500 mx-auto mb-8 leading-relaxed">
+                            大學願意多練、多學，求職時能力就比較齊；興趣也一樣——今天多花時間的「麻煩」，事後常有意想不到的好處。別讓便利取代反思；你值得更好的自己。
+                        </p>
+                        <p class="text-indigo-600 font-medium">感謝你的聆聽與思考 · 黃暉銘</p>
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="closingSlidePrev" class="closing-slide-arrow closing-slide-arrow--prev is-hidden" aria-label="上一頁" onclick="setClosingSlide(0)">←</button>
+            <button type="button" id="closingSlideNext" class="closing-slide-arrow closing-slide-arrow--next" aria-label="下一頁：結語" onclick="setClosingSlide(1)">→</button>
+        </div>
     </footer>
 
 </main>
@@ -658,14 +879,63 @@
 <script>
     // —— 靜態圖片路徑（與 repot.html 同資料夾的相對路徑；留空則僅顯示上傳或 placeholder）——
     const CONTACT_LINKS = {
-        email: { href: 'mailto:hanselfuture@gmail.com', label: 'hanselfuture@gmail.com' },
+        email: { copy: 'aminhuang900308@gmail.com', label: 'aminhuang900308@gmail.com' },
         instagram: { href: 'https://www.instagram.com/h.ansel_?igsh=MW9zNDhvcDRsemVo&utm_source=qr', label: '@h.asnel_' },
         linkedin: { href: 'https://www.linkedin.com/in/ansel-hunag-aba33b289?utm_source=share_via&utm_content=profile&utm_medium=member_ios', label: 'Ansel Huang' }
     };
 
+    function copyTextToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function (resolve, reject) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                resolve();
+            } catch (err) {
+                reject(err);
+            } finally {
+                document.body.removeChild(ta);
+            }
+        });
+    }
+
+    function bindEmailCopyLink() {
+        const el = document.getElementById('contact-email');
+        const data = CONTACT_LINKS.email;
+        if (!el || !data || !data.copy) return;
+        const label = el.querySelector('.contact-label');
+        if (label) label.textContent = data.label;
+        el.href = '#';
+        el.setAttribute('role', 'button');
+        el.setAttribute('title', '點擊複製 Email');
+        el.setAttribute('aria-label', '複製 Email：' + data.copy);
+        if (el.dataset.copyBound === '1') return;
+        el.dataset.copyBound = '1';
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            const defaultLabel = data.label;
+            copyTextToClipboard(data.copy).then(function () {
+                if (label) {
+                    label.textContent = '已複製！';
+                    setTimeout(function () { label.textContent = defaultLabel; }, 2000);
+                }
+            }).catch(function () {
+                if (label) label.textContent = '複製失敗，請手動複製';
+            });
+        });
+    }
+
     function applyContactLinks() {
+        bindEmailCopyLink();
         [
-            ['contact-email', CONTACT_LINKS.email],
             ['contact-instagram', CONTACT_LINKS.instagram],
             ['contact-linkedin', CONTACT_LINKS.linkedin]
         ].forEach(([id, data]) => {
@@ -741,9 +1011,42 @@
     }
     const STORAGE_PREFIX = 'report-image-';
 
-    function scrollToSection(id) {
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    function setClosingSlide(index) {
+        const track = document.getElementById('closingSlideTrack');
+        const prevBtn = document.getElementById('closingSlidePrev');
+        const nextBtn = document.getElementById('closingSlideNext');
+        if (!track) return;
+        const i = index === 1 ? 1 : 0;
+        track.setAttribute('data-index', String(i));
+        if (prevBtn) prevBtn.classList.toggle('is-hidden', i === 0);
+        if (nextBtn) nextBtn.classList.toggle('is-hidden', i === 1);
     }
+
+    function scrollToSection(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (id === 'closing') setClosingSlide(0);
+        el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.addEventListener('keydown', function (e) {
+        const closing = document.getElementById('closing');
+        if (!closing) return;
+        const rect = closing.getBoundingClientRect();
+        const inView = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.25;
+        if (!inView) return;
+        const track = document.getElementById('closingSlideTrack');
+        if (!track) return;
+        const idx = track.getAttribute('data-index') === '1' ? 1 : 0;
+        if (e.key === 'ArrowRight' && idx === 0) {
+            e.preventDefault();
+            setClosingSlide(1);
+        }
+        if (e.key === 'ArrowLeft' && idx === 1) {
+            e.preventDefault();
+            setClosingSlide(0);
+        }
+    });
 
     function showImageForSlot(slot, src) {
         const img = document.getElementById('img-' + slot);
@@ -836,7 +1139,7 @@
             labels: ['大一', '大二', '大三', '大四', '研究所', '職場'],
             datasets: [
                 {
-                    label: '投入努力 (努力與韌性累積)',
+                    label: '心態強度（內在反饋）',
                     data: [60, 75, 85, 90, 95, 100],
                     borderColor: '#4f46e5',
                     backgroundColor: 'rgba(79, 70, 229, 0.1)',
@@ -845,7 +1148,7 @@
                 },
                 {
                     label: '表面成績 (獎牌/外在回饋)',
-                    data: [40, 45, 45, 48, 55, 70],
+                    data: [50, 55, 60, 60, 62, 62],
                     borderColor: '#fbbf24',
                     borderDash: [5, 5],
                     tension: 0.1
