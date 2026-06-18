@@ -181,7 +181,7 @@
                 gold: {
                     name: "YSI 400 系列 + BIOPAC SKT100C",
                     type: "醫療級黃金標準",
-                    image: "pic/SkinT_GoldenS_SKT100C.jpg",
+                    image: "pic/SkinT_GoldenS_SKT+YSI.jpg",
                     specs: [
                         { label: "感測架構", value: "NTC 熱敏電阻 (2,252 Ω @ 25°C)" },
                         { label: "絕對精準度", value: "±0.1°C 至 ±0.2°C" },
@@ -191,14 +191,14 @@
                 },
                 clinical: [
                     {
-                        name: "greenTEG CORE",
-                        type: "運動測試金標",
-                        image: "pic/SkinT_ClinicialL_greenteg-core-2-waermesensor-koerperkern-temperaturmessung-im-sport~5.jpg",
+                        name: "BioIntelliSense BioButton",
+                        type: "遠距病患監護 (RPM)",
+                        image: "pic/SkinT_ClinicialL_BioButton.jpg",
                         specs: [
-                            { label: "核心技術", value: "熱通量 (Heat Flux) 感測器 + AI 演算" },
-                            { label: "精準度", value: "膚溫 ±0.05°C / 核心推算 MAE 0.21°C" },
-                            { label: "防護等級", value: "IP68 (1.5m 防水防汗)" },
-                            { label: "特色", value: "無需侵入即可推算體內核心溫度" }
+                            { label: "法規與標準", value: "符合 FDA 醫療級皮膚溫度監測標準；多項 510(k)（如 K212957、K241101）" },
+                            { label: "採樣策略", value: "連續背景採樣，每日高達 1,440 次統合測量" },
+                            { label: "防護等級", value: "IP47（防塵防潑水，適合長期居家配戴）" },
+                            { label: "臨床價值", value: "出院後過渡期持續監護，於急性惡化前預警，降低非預期 ICU 重返與 30 天再入院。" }
                         ]
                     },
                     {
@@ -220,7 +220,7 @@
                 gold: {
                     name: "BIOPAC PPG100C-MRI",
                     type: "醫學實驗室標準",
-                    image: "pic/PPG_GoldenS_PPG100.jpg",
+                    image: "pic/PPG_GoldenS_PPG100+Probe.png",
                     specs: [
                         { label: "量測核心", value: "脈搏傳遞時間 (PTT)、血液容積 (BVP)" },
                         { label: "雜訊抑制", value: "底噪極低 0.5 µV (rms)" },
@@ -230,25 +230,26 @@
                 },
                 clinical: [
                     {
-                        name: "Polar Verity Sense",
-                        type: "競技運動金標",
-                        image: "pic/PPG_ClinicailL_Polar Verity Sense.jpg",
+                        name: "Biobeat BB-613-BPM",
+                        type: "醫療級穿戴 (Cuffless)",
+                        image: "pic/PPG_GoldenS_Biobeat BB-613-BPM.jpg",
                         specs: [
-                            { label: "感測陣列", value: "6 顆高強度 LED + 空間冗餘設計" },
-                            { label: "採樣頻率", value: "55 Hz (SDK 可達 135-176 Hz)" },
-                            { label: "資料保真", value: "22-bit 超高解析原始資料輸出" },
-                            { label: "優勢", value: "上臂配戴，避開腕部肌腱干擾" }
+                            { label: "感測技術", value: "多波長 LED 光源與光二極體陣列 (PPG)" },
+                            { label: "測量原理", value: "脈波傳遞時間 (PWTT) 與脈搏波形分析；無充氣式血壓、血氧與心率" },
+                            { label: "法規許可", value: "FDA 510(k)（如 K241066）；CE 標誌，歐盟與以色列醫療器材核准" },
+                            { label: "臨床價值", value: "醫院／診所／長照與居家 RPM；減少白袍高血壓與不適，雲端串接 App／閘道器銜接院內外照護" }
                         ]
                     },
                     {
-                        name: "Whoop 5.0",
-                        type: "全天候健康追蹤",
-                        image: "pic/PPG_ClinicailL_Whoop 5.0.jpg",
+                        name: "Empatica EmbracePlus",
+                        type: "醫療腕帶",
+                        image: "pic/SkinT-ClinicialL_Empatica.jpg",
                         specs: [
-                            { label: "採樣策略", value: "約 26 Hz (優化續航力)" },
-                            { label: "感測架構", value: "5 顆 LED (3綠/1紅/1紅外) + 4 光二極體" },
-                            { label: "續航表現", value: "5 天背景連續監測" },
-                            { label: "局限性", value: "頻率較低，高頻 HRV 頻譜易失真" }
+                            { label: "PPG 感測模組", value: "醫療級綠/紅/紅外光 PPG 感測模組" },
+                            { label: "採樣頻率", value: "穩定的 64 Hz 連續採樣" },
+                            { label: "訊號濾波", value: "具備 0.5–4 Hz 硬體帶通濾波隔離心臟訊號" },
+                            { label: "多模態整合", value: "手腕配戴，與 EDA (4 Hz) / ACC (64 Hz) 深度融合" },
+                            { label: "臨床應用", value: "精神病學臨床試驗、情緒識別與認知功能預測" }
                         ]
                     }
                 ]
