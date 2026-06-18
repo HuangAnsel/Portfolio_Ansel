@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>醫療與運動級感測技術互動分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fcfcf9;
+            color: #2d3748;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        /* 裝置卡片翻轉 */
+        .device-flip-wrap {
+            perspective: 1200px;
+            cursor: pointer;
+            min-height: 280px;
+        }
+
+        .device-flip {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 280px;
+            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .device-flip-wrap.is-flipped .device-flip {
+            transform: rotateY(180deg);
+        }
+
+        .device-flip-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .device-flip-back {
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+        }
+
+        .device-flip-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 1rem;
+            background: #1e293b;
+        }
+
+        .flip-hint {
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .device-flip-wrap:focus-visible {
+            outline: 2px solid #6366f1;
+            outline-offset: 4px;
+            border-radius: 1rem;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #4f46e5;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        #mainTabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        #mainTabs button {
+            width: 100%;
+            text-align: center;
+            padding-bottom: 1rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .card-hover:not(.device-flip-wrap):hover {
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+
+        .spec-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+
+        .spec-value {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <header class="gradient-header text-white py-12 px-6 shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4 tracking-tight">生理感測技術：醫療與運動臨床等級規格分析</h1>
+            <p class="text-indigo-100 max-w-2xl text-lg leading-relaxed">
+                深入探討皮膚溫度、光學心率 (PPG) 與血氧飽和度 (SpO2) 的金標儀器規格。
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-10">
+        
+        <section class="mb-16">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-8">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <span class="mr-2">🔍</span> 快速導覽與核心結論
+                </h2>
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    本報告分析了從加護病房 (ICU) 到極限運動場域的感測技術演進。感測技術正從單純的「資料記錄」轉向「邊緣 AI 降噪」與「多模態融合」。以下透過互動分頁，您可以查看不同生理參數的技術斷層。
+                </p>
+                
+                <div id="mainTabs">
+                    <button type="button" onclick="switchTab('temp')" id="tab-temp" class="tab-active transition-all hover:text-indigo-600">皮膚溫度 (Temp)</button>
+                    <button type="button" onclick="switchTab('ppg')" id="tab-ppg" class="text-slate-500 hover:text-indigo-600 transition-all">光學心率 (PPG)</button>
+                    <button type="button" onclick="switchTab('spo2')" id="tab-spo2" class="text-slate-500 hover:text-indigo-600 transition-all">血氧飽和 (SpO2)</button>
+                </div>
+            </div>
+
+            <div id="content-area">
+                <!-- Content will be injected here by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-10 px-6">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-slate-400 text-sm mb-4">資料來源：根據《醫療與運動臨床等級之生理感測技術分析報告》整理製作</p>
+            <p class="text-slate-500 font-medium">© 2024 醫療感測技術互動實驗室 - 僅供學術探討與資訊參考</p>
+        </div>
+    </footer>
+
+    <script>
+        const sensorData = {
+            temp: {
+                title: "皮膚溫度 (Skin Temperature)",
+                desc: "皮膚溫度是人體熱力學的核心指標。量測最大挑戰在於感測器貼合度與環境干擾。醫療金標儀器需精準捕捉小於 0.5°C 的變化。",
+                gold: {
+                    name: "YSI 400 系列 + BIOPAC SKT100C",
+                    type: "醫療級黃金標準",
+                    image: "pic/SkinT_GoldenS_SKT100C.jpg",
+                    specs: [
+                        { label: "感測架構", value: "NTC 熱敏電阻 (2,252 Ω @ 25°C)" },
+                        { label: "絕對精準度", value: "±0.1°C 至 ±0.2°C" },
+                        { label: "解析度", value: "0.0001°C" },
+                        { label: "應用場域", value: "重症麻醉監控、精神生理學研究" }
+                    ]
+                },
+                clinical: [
+                    {
+                        name: "greenTEG CORE",
+                        type: "運動測試金標",
+                        image: "pic/SkinT_ClinicialL_greenteg-core-2-waermesensor-koerperkern-temperaturmessung-im-sport~5.jpg",
+                        specs: [
+                            { label: "核心技術", value: "熱通量 (Heat Flux) 感測器 + AI 演算" },
+                            { label: "精準度", value: "膚溫 ±0.05°C / 核心推算 MAE 0.21°C" },
+                            { label: "防護等級", value: "IP68 (1.5m 防水防汗)" },
+                            { label: "特色", value: "無需侵入即可推算體內核心溫度" }
+                        ]
+                    },
+                    {
+                        name: "Empatica EmbracePlus",
+                        type: "臨床醫學研究用",
+                        image: "pic/SkinT-ClinicialL_Empatica.jpg",
+                        specs: [
+                            { label: "採樣頻率", value: "4 Hz (每秒 4 次高頻採樣)" },
+                            { label: "精準度", value: "±0.1°C (於 30-45°C 範圍)" },
+                            { label: "臨床應用", value: "失智症激越預測、睡眠情緒分析" },
+                            { label: "特色", value: "多參數融合 (EDA/ACC/Temp)" }
+                        ]
+                    }
+                ]
+            },
+            ppg: {
+                title: "光學心率 (Photoplethysmography)",
+                desc: "透過特定波長光線穿透皮膚測量血液容積變化。在動態環境下，肌肉收縮產生的運動偽影是精準度的最大威脅。",
+                gold: {
+                    name: "BIOPAC PPG100C-MRI",
+                    type: "醫學實驗室標準",
+                    image: "pic/PPG_GoldenS_PPG100.jpg",
+                    specs: [
+                        { label: "量測核心", value: "脈搏傳遞時間 (PTT)、血液容積 (BVP)" },
+                        { label: "雜訊抑制", value: "底噪極低 0.5 µV (rms)" },
+                        { label: "MRI 相容性", value: "雙階 RF 濾波，耐受 7T 強磁場" },
+                        { label: "應用場域", value: "fMRI 腦血流同步研究、動脈順應性分析" }
+                    ]
+                },
+                clinical: [
+                    {
+                        name: "Polar Verity Sense",
+                        type: "競技運動金標",
+                        image: "pic/PPG_ClinicailL_Polar Verity Sense.jpg",
+                        specs: [
+                            { label: "感測陣列", value: "6 顆高強度 LED + 空間冗餘設計" },
+                            { label: "採樣頻率", value: "55 Hz (SDK 可達 135-176 Hz)" },
+                            { label: "資料保真", value: "22-bit 超高解析原始資料輸出" },
+                            { label: "優勢", value: "上臂配戴，避開腕部肌腱干擾" }
+                        ]
+                    },
+                    {
+                        name: "Whoop 5.0",
+                        type: "全天候健康追蹤",
+                        image: "pic/PPG_ClinicailL_Whoop 5.0.jpg",
+                        specs: [
+                            { label: "採樣策略", value: "約 26 Hz (優化續航力)" },
+                            { label: "感測架構", value: "5 顆 LED (3綠/1紅/1紅外) + 4 光二極體" },
+                            { label: "續航表現", value: "5 天背景連續監測" },
+                            { label: "局限性", value: "頻率較低，高頻 HRV 頻譜易失真" }
+                        ]
+                    }
+                ]
+            },
+            spo2: {
+                title: "血氧飽和度 (SpO2)",
+                desc: "依據比爾-朗伯定律計算氧合血紅素比例。醫療級儀器必須在劇烈躁動與低灌注（血液循環差）狀態下維持誤差小於 ±3%。",
+                gold: {
+                    name: "Masimo Radical-7",
+                    type: "臨床加護病房金標",
+                    image: "pic/SpO2_GoldenS_Masimo Radical-7.jpg",
+                    specs: [
+                        { label: "核心技術", value: "Masimo SET® 離散飽和度轉換" },
+                        { label: "精準度", value: "運動狀態 ±3% / 低灌注 ±2%" },
+                        { label: "進階參數", value: "SpHb (血紅素)、SpCO (一氧化碳)、PVi" },
+                        { label: "波長", value: "Rainbow SET 多波長陣列 (7種以上)" }
+                    ]
+                },
+                clinical: [
+                    {
+                        name: "Nonin Onyx Vantage 9590",
+                        type: "急救與巡房標準",
+                        image: "pic/SpO2_ClinicailL_Nonin Onyx Vantage 9590.jpg",
+                        specs: [
+                            { label: "演算法", value: "PureSAT® 智慧脈搏濾波" },
+                            { label: "膚色偏差", value: "通過 FDA 驗證，適用深膚色患者" },
+                            { label: "耐用性", value: "軍規抗摔 (50次落摔測試)" },
+                            { label: "精準度", value: "70-100% 區間均為 ±2%" }
+                        ]
+                    },
+                    {
+                        name: "Viatom O2Ring",
+                        type: "睡眠監測臨床等級",
+                        image: "pic/SpO2_ClinicailL_Viatom O2Ring.jpg",
+                        specs: [
+                            { label: "採樣機制", value: "內部 200 Hz 採樣，每秒記錄一筆" },
+                            { label: "測量方式", value: "醫療級透射式 (Transmissive)" },
+                            { label: "智慧喚醒", value: "低血氧即時震動提醒，防止窒息" },
+                            { label: "應用場域", value: "居家睡眠呼吸中止篩檢" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        function switchTab(tabId) {
+            const tabs = ['temp', 'ppg', 'spo2'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.remove('tab-active');
+                document.getElementById(`tab-${t}`).classList.add('text-slate-500');
+            });
+            document.getElementById(`tab-${tabId}`).classList.add('tab-active');
+            document.getElementById(`tab-${tabId}`).classList.remove('text-slate-500');
+
+            renderContent(tabId);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+        }
+
+        function imageSrc(path) {
+            if (!path) return '';
+            return encodeURI(path).replace(/#/g, '%23');
+        }
+
+        function renderSpecsGrid(specs, labelClass, valueClass) {
+            return specs.map(s => `
+                <div>
+                    <p class="${labelClass}">${escapeHtml(s.label)}</p>
+                    <p class="${valueClass}">${escapeHtml(s.value)}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderDeviceCard(item, variant) {
+            const isGold = variant === 'gold';
+            const img = item.image ? imageSrc(item.image) : '';
+            const hasImage = Boolean(img);
+
+            const labelClass = isGold ? 'text-slate-400 text-xs uppercase font-bold mb-1' : 'spec-label';
+            const valueClass = isGold ? 'text-indigo-50 font-medium' : 'spec-value';
+
+            const specsBlock = isGold
+                ? `<div class="space-y-6">${item.specs.map(s => `
+                        <div>
+                            <p class="${labelClass}">${escapeHtml(s.label)}</p>
+                            <p class="${valueClass}">${escapeHtml(s.value)}</p>
+                        </div>
+                    `).join('')}</div>`
+                : `<div class="grid grid-cols-2 gap-4">${renderSpecsGrid(item.specs, labelClass, valueClass)}</div>`;
+
+            const frontShell = isGold
+                ? 'device-flip-face bg-slate-800 text-white p-8 shadow-xl relative overflow-hidden rounded-3xl'
+                : 'device-flip-face bg-white p-6 shadow-sm border border-slate-100 rounded-2xl';
+
+            const titleClass = isGold ? 'text-2xl font-bold mb-6' : 'text-lg font-bold text-slate-800';
+            const badge = isGold
+                ? `<h4 class="text-xs uppercase tracking-widest text-indigo-400 font-bold mb-2">黃金標準 / Gold Standard</h4>`
+                : `<span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded font-bold shrink-0">${escapeHtml(item.type)}</span>`;
+
+            const star = isGold
+                ? `<div class="absolute -right-4 -top-4 text-slate-700 text-9xl font-bold opacity-20 pointer-events-none">★</div>`
+                : '';
+
+            const headerRow = isGold
+                ? `${badge}<h5 class="${titleClass}">${escapeHtml(item.name)}</h5>`
+                : `<div class="flex justify-between items-start mb-4 gap-2">
+                        <h4 class="${titleClass}">${escapeHtml(item.name)}</h4>
+                        ${badge}
+                   </div>`;
+
+            const backContent = hasImage
+                ? `<img src="${img}" alt="${escapeHtml(item.name)}" loading="lazy" />
+                   <p class="text-xs text-slate-400 px-4 pb-3 text-center">再點一次返回規格</p>`
+                : `<p class="text-slate-400 text-sm px-6 text-center">尚無裝置圖片</p>`;
+
+            const hint = hasImage
+                ? `<p class="flip-hint ${isGold ? '!text-slate-500' : ''}">點擊卡片查看裝置圖片</p>`
+                : '';
+
+            return `
+                <div class="device-flip-wrap card-hover h-full"
+                     role="button"
+                     tabindex="0"
+                     aria-label="${escapeHtml(item.name)}：點擊翻轉查看圖片"
+                     aria-pressed="false"
+                     ${hasImage ? '' : 'data-no-flip="true"'}>
+                    <div class="device-flip">
+                        <div class="${frontShell}">
+                            ${star}
+                            ${headerRow}
+                            ${specsBlock}
+                            ${hint}
+                        </div>
+                        <div class="device-flip-face device-flip-back shadow-xl border border-slate-700">
+                            ${backContent}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function bindFlipCards(root) {
+            root.querySelectorAll('.device-flip-wrap:not([data-no-flip])').forEach(wrap => {
+                const toggle = () => {
+                    const flipped = wrap.classList.toggle('is-flipped');
+                    wrap.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+                };
+                wrap.addEventListener('click', toggle);
+                wrap.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggle();
+                    }
+                });
+            });
+        }
+
+        function renderContent(tabId) {
+            const container = document.getElementById('content-area');
+            const data = sensorData[tabId];
+            if (!data) return;
+            let clinicalHtml = data.clinical.map(item => renderDeviceCard(item, 'clinical')).join('');
+
+            container.innerHTML = `
+                <div class="animate-fadeIn">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">${data.title}</h3>
+                        <p class="text-slate-600">${data.desc}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1">
+                            ${renderDeviceCard(data.gold, 'gold')}
+                        </div>
+                        <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            ${clinicalHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            bindFlipCards(container);
+        }
+
+        window.onload = () => {
+            switchTab('temp');
+        };
+
+        // Add some CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fadeIn {
+                animation: fadeIn 0.4s ease-out forwards;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
