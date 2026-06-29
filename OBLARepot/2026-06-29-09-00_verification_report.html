@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verification: Comparison of laboratory test results with fit file records</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --bg-soft: #1a2332;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #3b82f6;
+      --accent-soft: #dbeafe;
+      --border: #e2e8f0;
+      --hero-from: #1e3a5f;
+      --hero-to: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang TC", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
+      background: linear-gradient(180deg, #eef2f7 0%, #f8fafc 40%);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--hero-from) 0%, var(--hero-to) 100%);
+      color: #f8fafc;
+      padding: 40px 24px 36px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.25);
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; }
+    .hero h1 {
+      font-size: clamp(1.35rem, 3.2vw, 2rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 0 0 12px;
+      letter-spacing: -0.02em;
+      max-width: 900px;
+    }
+    .hero-meta {
+      font-size: 0.9rem;
+      color: rgba(248, 250, 252, 0.75);
+      display: flex; flex-wrap: wrap; gap: 8px 20px;
+    }
+    .wrap { max-width: 1200px; margin: -20px auto 0; padding: 0 20px 56px; position: relative; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(200px, auto) minmax(220px, 1fr) auto;
+      gap: 20px 28px;
+      align-items: end;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 22px; margin-bottom: 24px;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+    }
+    @media (max-width: 720px) {
+      .toolbar { grid-template-columns: 1fr; }
+    }
+    .trust-panel {
+      width: 100%;
+      max-width: 420px;
+      justify-self: center;
+    }
+    .trust-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+      gap: 12px;
+    }
+    .trust-head .score-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .toolbar label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+    select {
+      min-width: 260px; padding: 10px 12px; font-size: 0.95rem;
+      border: 1px solid var(--border); border-radius: 8px; background: #fff;
+    }
+    .model-badge {
+      display: inline-block; padding: 8px 14px; border-radius: 999px;
+      background: var(--accent-soft); color: #1d4ed8; font-size: 0.82rem; font-weight: 600;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+      box-shadow: 0 2px 16px rgba(15, 23, 42, 0.06);
+    }
+    .card h2 { font-size: 1.05rem; margin: 0 0 14px; color: #334155; }
+    .chart-box {
+      min-height: 300px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #f8fafc, #f1f5f9); border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .chart-box img { max-width: 100%; height: auto; display: block; }
+    .chart-caption { font-size: 0.78rem; color: var(--muted); margin-top: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 8px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    td:last-child { font-weight: 600; color: #1e293b; }
+    .file-bars { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .file-row { margin-bottom: 16px; }
+    .file-row .label { font-size: 0.78rem; margin-bottom: 6px; word-break: break-all; color: #475569; }
+    .bar-track {
+      height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, #2563eb, #06b6d4);
+      transition: width 0.35s ease;
+    }
+    .bar-scale { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-top: 6px; }
+    .insight {
+      margin-top: 24px; background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+      box-shadow: 0 2px 16px rgba(15, 23, 42, 0.06);
+    }
+    .insight h2 { font-size: 1.05rem; margin: 0 0 12px; color: #334155; }
+    .insight p { margin: 0; white-space: pre-wrap; font-size: 0.92rem; color: #475569; }
+    .empty { color: var(--muted); font-size: 0.9rem; }
+    .display-name { font-size: 1.1rem; font-weight: 700; margin: 0 0 12px; color: #0f172a; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Verification: Comparison of laboratory test results with fit file records</h1>
+      <div class="hero-meta">
+        <span>訓練閾值驗證報告 · Training Threshold Verification</span>
+        <span>產生時間 2026-06-29 09:04</span>
+        <span>Run 2026-06-29-09-00</span>
+      </div>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="toolbar">
+      <div>
+        <label for="subjectSelect">受試者 User</label><br />
+        <select id="subjectSelect" aria-label="受試者"></select>
+      </div>
+      <div class="trust-panel" id="trustPanel" aria-live="polite">
+        <div class="trust-head">
+          <label for="trustBarFill">信任分數 Trust Score</label>
+          <span class="score-value" id="trustScoreText">— / 10</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="trustBarFill" style="width:0%"></div>
+        </div>
+        <div class="bar-scale"><span>1</span><span>10</span></div>
+      </div>
+      <div>
+        <span class="model-badge" id="modelBadge">—</span>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h2>關鍵閾值 Selected Threshold</h2>
+        <div class="chart-box" id="chartBox"><span class="empty">無 R 圖表</span></div>
+        <p class="chart-caption">基於 La/HR 關聯之折線圖（R lactater 產出）</p>
+      </div>
+      <div class="card">
+        <h2>現場紀錄驗證 Field Data Validation</h2>
+        <p id="displayName" class="display-name"></p>
+        <table>
+          <thead><tr><th>項目</th><th>模型對應數據</th></tr></thead>
+          <tbody id="metricBody"></tbody>
+        </table>
+        <div class="file-bars">
+          <h3 style="font-size:0.9rem;margin:0 0 8px;">File Duration（Compare3 通過、依時長前 3）</h3>
+          <div id="fileBars"></div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <h2>智慧洞察分析 Insight Analysis</h2>
+      <p id="insightText"></p>
+    </div>
+  </div>
+  <script>
+    const REPORT = {"title": "Verification: Comparison of laboratory test results with fit file records", "subtitle": "訓練閾值驗證報告 · Training Threshold Verification", "generated": "2026-06-29 09:04", "stamp": "2026-06-29-09-00", "subjects": [{"no": "136", "name": "黃冠儀", "group": 4, "model": "mDmax", "thresholdHr": 169.0, "thresholdLa": 4.5, "thresholdSpeed": 17.31, "plotUrl": "report_plots/HR_mDmax_136_黃冠儀_VO2max.png", "insight": "user [黃冠儀]，因為 HR 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [169]，OBLA : [167]]。因為以上情況選擇使用 mDmax 進行比較，尚無 ≥30 分鐘且 avg HR ≥ 參考門檻的實跑紀錄。（最終 Group 4）", "topFiles": [], "trustScore": 4.0}, {"no": "137", "name": "蕭智遠", "group": 5, "model": "OBLA", "thresholdHr": 171.0, "thresholdLa": 4.0, "thresholdSpeed": 14.33, "plotUrl": "report_plots/HR_OBLA4_137_蕭智遠_VO2max.png", "insight": "user [蕭智遠]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [164]，OBLA : [171]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 42.9% 的相符率（ref～ref+3 bpm 通過 9/21 筆）。（最終 Group 5）", "topFiles": [{"fileName": "137_15_2025-12-07_21188975593_split.csv", "durationMin": 61.1, "avgHr": 171.69, "avgSpeed": 14.75}, {"fileName": "137_15_2025-09-21_20450555415_split.csv", "durationMin": 40.5, "avgHr": 173.0, "avgSpeed": 14.72}, {"fileName": "137_15_2025-07-25_19843214860_split.csv", "durationMin": 39.5, "avgHr": 172.25, "avgSpeed": 14.0}], "trustScore": 6.5}, {"no": "138", "name": "許瑋倪", "group": 4, "model": "mDmax", "thresholdHr": 170.0, "thresholdLa": 5.3, "thresholdSpeed": 10.98, "plotUrl": "report_plots/HR_mDmax_138_許瑋倪_VO2max.png", "insight": "user [許瑋倪]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [170]，OBLA : [162]]。因為以上情況選擇使用 mDmax 進行比較，發現和真實記錄相比有 46.2% 的相符率（ref～ref+3 bpm 通過 6/13 筆）。（最終 Group 4）", "topFiles": [{"fileName": "138_15_2025-06-12_running_19409780314_split.csv", "durationMin": 58.9, "avgHr": 170.73, "avgSpeed": 10.05}, {"fileName": "138_15_2025-10-14_running_20686050208_split.csv", "durationMin": 51.9, "avgHr": 172.44, "avgSpeed": 10.35}, {"fileName": "138_15_2025-11-11_running_20957261985_split.csv", "durationMin": 51.5, "avgHr": 172.6, "avgSpeed": 10.47}], "trustScore": 6.0}, {"no": "142", "name": "朱方洵", "group": 4, "model": "mDmax", "thresholdHr": 164.0, "thresholdLa": 6.2, "thresholdSpeed": 11.63, "plotUrl": "report_plots/HR_mDmax_142_朱方洵_VO2max.png", "insight": "user [朱方洵]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [164]，OBLA : [156]]。因為以上情況選擇使用 mDmax 進行比較，發現和真實記錄相比有 62.9% 的相符率（ref～ref+3 bpm 通過 22/35 筆）。（最終 Group 4）", "topFiles": [{"fileName": "142_15_2025-10-26_running_20797098374_split.csv", "durationMin": 119.2, "avgHr": 164.57, "avgSpeed": 10.69}, {"fileName": "142_20_3_2_4_2025_10_26_running_20797098374.csv", "durationMin": 119.2, "avgHr": 164.57, "avgSpeed": 10.69}, {"fileName": "142_20_3_2_4_2025_10_26_running_20797098374_split.csv", "durationMin": 119.2, "avgHr": 164.57, "avgSpeed": 10.69}], "trustScore": 7.5}, {"no": "143", "name": "周平記", "group": 5, "model": "OBLA", "thresholdHr": 153.0, "thresholdLa": 4.0, "thresholdSpeed": 13.85, "plotUrl": "report_plots/HR_OBLA4_143_周平記_VO2max.png", "insight": "user [周平記]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 19.0% 的相符率（ref～ref+3 bpm 通過 8/42 筆）。（最終 Group 5）", "topFiles": [{"fileName": "143_15_2026-03-01_running_22019354197_split.csv", "durationMin": 141.7, "avgHr": 155.91, "avgSpeed": 13.81}, {"fileName": "143_15_2025-05-17_running_19146729269_split.csv", "durationMin": 101.4, "avgHr": 154.14, "avgSpeed": 12.6}, {"fileName": "143_15_2025-02-16_running_18287641677_split.csv", "durationMin": 85.8, "avgHr": 154.63, "avgSpeed": 14.74}], "trustScore": 4.0}, {"no": "144", "name": "戴嘉賢", "group": 4, "model": "mDmax", "thresholdHr": 174.0, "thresholdLa": 4.1, "thresholdSpeed": 17.23, "plotUrl": "report_plots/HR_mDmax_144_戴嘉賢_VO2max.png", "insight": "user [戴嘉賢]，因為 HR 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [174]，OBLA : [173]]。因為以上情況選擇使用 mDmax 進行比較，尚無 ≥30 分鐘且 avg HR ≥ 參考門檻的實跑紀錄。（最終 Group 4）", "topFiles": [], "trustScore": 4.0}, {"no": "145", "name": "戴詩芸", "group": 5, "model": "OBLA", "thresholdHr": 169.0, "thresholdLa": 4.0, "thresholdSpeed": 10.82, "plotUrl": "report_plots/HR_OBLA4_145_戴詩芸_VO2max.png", "insight": "user [戴詩芸]，因為 RPE、HR 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [169]，OBLA : [169]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 20.0% 的相符率（ref～ref+3 bpm 通過 1/5 筆）。（最終 Group 5）", "topFiles": [{"fileName": "145_15_2026-03-20_running_22234929791_split.csv", "durationMin": 35.4, "avgHr": 169.74, "avgSpeed": 11.87}], "trustScore": 3.0}, {"no": "146", "name": "雷騰翔", "group": 5, "model": "OBLA", "thresholdHr": 192.0, "thresholdLa": 4.0, "thresholdSpeed": 15.39, "plotUrl": "report_plots/HR_OBLA4_146_雷騰翔_VO2max.png", "insight": "user [雷騰翔]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 100.0% 的相符率（ref～ref+3 bpm 通過 1/1 筆）。（最終 Group 5）", "topFiles": [{"fileName": "146_15_2025-10-26_20803990148_split.csv", "durationMin": 38.9, "avgHr": 193.13, "avgSpeed": 15.4}], "trustScore": 9.5}, {"no": "148", "name": "鄭允然", "group": 5, "model": "OBLA", "thresholdHr": 170.0, "thresholdLa": 4.0, "thresholdSpeed": 11.97, "plotUrl": "report_plots/HR_OBLA4_148_鄭允然_VO2max.png", "insight": "user [鄭允然]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [164]，OBLA : [170]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 28.6% 的相符率（ref～ref+3 bpm 通過 2/7 筆）。（最終 Group 5）", "topFiles": [{"fileName": "148_15_2025-02-24_18360207948_split.csv", "durationMin": 166.1, "avgHr": 170.55, "avgSpeed": 13.3}, {"fileName": "148_15_2025-08-23_20145873916_split.csv", "durationMin": 58.3, "avgHr": 170.41, "avgSpeed": 12.27}], "trustScore": 5.0}, {"no": "149", "name": "劉姿廷", "group": 5, "model": "OBLA", "thresholdHr": 180.0, "thresholdLa": 4.0, "thresholdSpeed": 14.1, "plotUrl": "report_plots/HR_OBLA4_149_劉姿廷_VO2max.png", "insight": "user [劉姿廷]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 100.0% 的相符率（ref～ref+3 bpm 通過 1/1 筆）。（最終 Group 5）", "topFiles": [{"fileName": "149_15_2026-01-11_running_21506898223_split.csv", "durationMin": 96.6, "avgHr": 180.59, "avgSpeed": 13.19}], "trustScore": 10.0}, {"no": "150", "name": "林茵婷", "group": 5, "model": "OBLA", "thresholdHr": 163.0, "thresholdLa": 4.0, "thresholdSpeed": 11.45, "plotUrl": "report_plots/HR_OBLA4_150_林茵婷_VO2max.png", "insight": "user [林茵婷]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 40.0% 的相符率（ref～ref+3 bpm 通過 8/20 筆）。（最終 Group 5）", "topFiles": [{"fileName": "150_15_2025-12-07_21188608084_split.csv", "durationMin": 116.2, "avgHr": 164.89, "avgSpeed": 11.5}, {"fileName": "150_15_2025-08-03_19935111994_split.csv", "durationMin": 100.6, "avgHr": 164.11, "avgSpeed": 10.29}, {"fileName": "150_15_2025-11-29_21119931673_split.csv", "durationMin": 91.2, "avgHr": 164.97, "avgSpeed": 11.38}], "trustScore": 5.0}, {"no": "151", "name": "林慧婷", "group": 4, "model": "mDmax", "thresholdHr": 170.0, "thresholdLa": 5.2, "thresholdSpeed": 12.34, "plotUrl": "report_plots/HR_mDmax_151_林慧婷_VO2max.png", "insight": "user [林慧婷]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [170]，OBLA : [165]]。因為以上情況選擇使用 mDmax 進行比較，尚無 ≥30 分鐘且 avg HR ≥ 參考門檻的實跑紀錄。（最終 Group 4）", "topFiles": [], "trustScore": 4.0}, {"no": "152", "name": "王宥錡", "group": 5, "model": "OBLA", "thresholdHr": 176.0, "thresholdLa": 4.0, "thresholdSpeed": 14.57, "plotUrl": "report_plots/HR_OBLA4_152_王宥錡_VO2max.png", "insight": "user [王宥錡]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 50.0% 的相符率（ref～ref+3 bpm 通過 2/4 筆）。（最終 Group 5）", "topFiles": [{"fileName": "152_15_20260315_476079102063837194_split.csv", "durationMin": 42.8, "avgHr": 177.96, "avgSpeed": 14.57}, {"fileName": "152_15_20251221_474132260507910153_split.csv", "durationMin": 42.5, "avgHr": 177.38, "avgSpeed": 13.9}], "trustScore": 7.0}, {"no": "153", "name": "江雲駒", "group": 5, "model": "OBLA", "thresholdHr": 176.0, "thresholdLa": 4.0, "thresholdSpeed": 15.61, "plotUrl": "report_plots/HR_OBLA4_153_江雲駒_VO2max.png", "insight": "user [江雲駒]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 83.3% 的相符率（ref～ref+3 bpm 通過 5/6 筆）。（最終 Group 5）", "topFiles": [{"fileName": "153_15_2025-09-21_running_20450362695_split.csv", "durationMin": 89.7, "avgHr": 177.76, "avgSpeed": 14.14}, {"fileName": "153_15_2026-01-04_running_21435263479_split.csv", "durationMin": 87.5, "avgHr": 177.18, "avgSpeed": 14.58}, {"fileName": "153_15_2025-03-22_running_18600089397_split.csv", "durationMin": 74.4, "avgHr": 176.56, "avgSpeed": 12.75}], "trustScore": 9.5}, {"no": "154", "name": "鄭欣慈", "group": 5, "model": "OBLA", "thresholdHr": 186.0, "thresholdLa": 4.0, "thresholdSpeed": 13.7, "plotUrl": "report_plots/HR_OBLA4_154_鄭欣慈_VO2max.png", "insight": "user [鄭欣慈]，因為 HR 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [185]，OBLA : [186]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 100.0% 的相符率（ref～ref+3 bpm 通過 1/1 筆）。（最終 Group 5）", "topFiles": [{"fileName": "154_15_2025-11-30_21126659583_split.csv", "durationMin": 98.4, "avgHr": 186.87, "avgSpeed": 12.9}], "trustScore": 9.5}, {"no": "155", "name": "Eddy", "group": 4, "model": "mDmax", "thresholdHr": 165.0, "thresholdLa": 6.1, "thresholdSpeed": 13.37, "plotUrl": "report_plots/HR_mDmax_155_Eddy_VO2max.png", "insight": "user [Eddy]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [165]，OBLA : [154]]。因為以上情況選擇使用 mDmax 進行比較，發現和真實記錄相比有 100.0% 的相符率（ref～ref+3 bpm 通過 3/3 筆）。（最終 Group 4）", "topFiles": [{"fileName": "155_15_2025-05-25_running_19225564388_split.csv", "durationMin": 88.9, "avgHr": 166.8, "avgSpeed": 13.94}, {"fileName": "155_15_2025-05-03_running_19007274686_split.csv", "durationMin": 45.5, "avgHr": 165.41, "avgSpeed": 14.05}, {"fileName": "155_15_2025-10-11_running_20650933934_split.csv", "durationMin": 30.7, "avgHr": 165.47, "avgSpeed": 12.97}], "trustScore": 9.0}, {"no": "156", "name": "王秋竣", "group": 4, "model": "OBLA", "thresholdHr": 169.0, "thresholdLa": 4.0, "thresholdSpeed": 15.93, "plotUrl": "report_plots/HR_OBLA4_156_王秋竣_VO2max.png", "insight": "user [王秋竣]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 0.0% 的相符率（ref～ref+3 bpm 通過 0/1 筆）。（最終 Group 4）", "topFiles": [], "trustScore": 3.5}, {"no": "157", "name": "王信凱", "group": 5, "model": "OBLA", "thresholdHr": 174.0, "thresholdLa": 4.0, "thresholdSpeed": 14.86, "plotUrl": "report_plots/HR_OBLA4_157_王信凱_VO2max.png", "insight": "user [王信凱]，因為 RPE、HR 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [169]，OBLA : [174]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 25.0% 的相符率（ref～ref+3 bpm 通過 1/4 筆）。（最終 Group 5）", "topFiles": [{"fileName": "157_15_2026-01-08_21481473827_split.csv", "durationMin": 36.2, "avgHr": 175.44, "avgSpeed": 13.27}], "trustScore": 4.5}, {"no": "158", "name": "謝艾芸", "group": 5, "model": "OBLA", "thresholdHr": 166.0, "thresholdLa": 4.0, "thresholdSpeed": 12.4, "plotUrl": "report_plots/HR_OBLA4_158_謝艾芸_VO2max.png", "insight": "user [謝艾芸]，因為 RPE、HR 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [164]，OBLA : [166]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 33.3% 的相符率（ref～ref+3 bpm 通過 2/6 筆）。（最終 Group 5）", "topFiles": [{"fileName": "158_15_2025-03-09_running_18478957815_split.csv", "durationMin": 112.7, "avgHr": 168.83, "avgSpeed": 9.94}, {"fileName": "158_15_2025-02-23_running_18350497002_split.csv", "durationMin": 64.1, "avgHr": 167.86, "avgSpeed": 9.58}], "trustScore": 4.5}, {"no": "159", "name": "王子齊", "group": 4, "model": "mDmax", "thresholdHr": 191.0, "thresholdLa": 4.1, "thresholdSpeed": 12.83, "plotUrl": "report_plots/HR_mDmax_159_王子齊_VO2max.png", "insight": "user [王子齊]，因為 RPE、HR 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [191]，OBLA : [190]]。因為以上情況選擇使用 mDmax 進行比較，發現和真實記錄相比有 83.3% 的相符率（ref～ref+3 bpm 通過 5/6 筆）。（最終 Group 4）", "topFiles": [{"fileName": "159_15_2026-05-16_running_22894826196_split.csv", "durationMin": 67.6, "avgHr": 191.61, "avgSpeed": 11.72}, {"fileName": "159_15_2025-09-28_running_20520418265_split.csv", "durationMin": 50.1, "avgHr": 192.19, "avgSpeed": 12.54}, {"fileName": "159_15_2025-11-23_running_21064557781_split.csv", "durationMin": 47.6, "avgHr": 191.95, "avgSpeed": 12.67}], "trustScore": 8.5}, {"no": "160", "name": "歐陽中和", "group": 8, "model": "OBLA", "thresholdHr": 179.0, "thresholdLa": 4.0, "thresholdSpeed": 14.61, "plotUrl": "report_plots/HR_OBLA4_160_歐陽中和_VO2max.png", "insight": "user [歐陽中和]，因為 HR 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [177]，OBLA : [179]]。因為以上情況選擇使用 OBLA 進行比較，尚無 ≥30 分鐘且 avg HR ≥ 參考門檻的實跑紀錄。（最終 Group 8）", "topFiles": [], "trustScore": 7.0}, {"no": "161", "name": "連德宜", "group": 5, "model": "OBLA", "thresholdHr": 153.0, "thresholdLa": 4.0, "thresholdSpeed": 13.83, "plotUrl": "report_plots/HR_OBLA4_161_連德宜_VO2max.png", "insight": "user [連德宜]，因為 RPE、HR 皆符合，進而為 1 群，進而用 OBLA 進行比較，發現和真實記錄相比有 46.7% 的相符率（ref～ref+3 bpm 通過 14/30 筆）。（最終 Group 5）", "topFiles": [{"fileName": "161_15_2025-04-21_running_18895665575_split.csv", "durationMin": 200.7, "avgHr": 154.57, "avgSpeed": 12.7}, {"fileName": "161_15_2026-04-26_running_22665384212_split.csv", "durationMin": 113.0, "avgHr": 155.7, "avgSpeed": 13.12}, {"fileName": "161_15_2025-10-26_running_20797099530_split.csv", "durationMin": 97.4, "avgHr": 155.75, "avgSpeed": 13.08}], "trustScore": 6.5}, {"no": "163", "name": "王敏玲", "group": 5, "model": "OBLA", "thresholdHr": 144.0, "thresholdLa": 4.0, "thresholdSpeed": 11.92, "plotUrl": "report_plots/HR_OBLA4_163_王敏玲_VO2max.png", "insight": "user [王敏玲]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [132]，OBLA : [144]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 14.6% 的相符率（ref～ref+3 bpm 通過 15/103 筆）。（最終 Group 5）", "topFiles": [{"fileName": "163_15_2025-10-05_running_20591227273_split.csv", "durationMin": 104.5, "avgHr": 146.07, "avgSpeed": 10.57}, {"fileName": "163_15_2025-01-11_running_17970496069_split.csv", "durationMin": 71.7, "avgHr": 144.29, "avgSpeed": 11.19}, {"fileName": "163_15_2025-06-21_running_19496020625_split.csv", "durationMin": 62.1, "avgHr": 146.69, "avgSpeed": 9.75}], "trustScore": 3.5}, {"no": "164", "name": "林偉立", "group": 4, "model": "mDmax", "thresholdHr": 176.0, "thresholdLa": 4.5, "thresholdSpeed": 14.58, "plotUrl": "report_plots/HR_mDmax_164_林偉立_VO2max.png", "insight": "user [林偉立]，因為 HR 未符合標準，轉換至 2 群，其強度邏輯 不符合 標準，門檻為 [mDmax : [176]，OBLA : [174]]。因為以上情況選擇使用 mDmax 進行比較，尚無 ≥30 分鐘且 avg HR ≥ 參考門檻的實跑紀錄。（最終 Group 4）", "topFiles": [], "trustScore": 4.0}, {"no": "165", "name": "曹建國", "group": 5, "model": "OBLA", "thresholdHr": 150.0, "thresholdLa": 4.0, "thresholdSpeed": 14.69, "plotUrl": "report_plots/HR_OBLA4_165_曹建國_VO2max.png", "insight": "user [曹建國]，因為 RPE 未符合標準，轉換至 2 群，其強度邏輯 符合 標準，門檻為 [mDmax : [150]，OBLA : [150]]。因為以上情況選擇使用 OBLA 進行比較，發現和真實記錄相比有 37.7% 的相符率（ref～ref+3 bpm 通過 20/53 筆）。（最終 Group 5）", "topFiles": [{"fileName": "165_15_2025-03-01_running_18404564295_split.csv", "durationMin": 107.7, "avgHr": 150.26, "avgSpeed": 12.25}, {"fileName": "165_15_2025-07-30_running_19896337404_split.csv", "durationMin": 75.1, "avgHr": 150.5, "avgSpeed": 12.44}, {"fileName": "165_15_2026-01-15_running_21555050429_split.csv", "durationMin": 73.3, "avgHr": 151.33, "avgSpeed": 13.59}], "trustScore": 5.0}]};
+    const BAR_MAX_MIN = 120;
+
+    function fmt(v, unit) {
+      if (v === null || v === undefined || v === "") return "—";
+      if (unit === "bpm") return Math.round(v) + " bpm";
+      if (unit === "la") return v.toFixed(1) + " mmol/L";
+      if (unit === "kph") return v.toFixed(2) + " km/h";
+      return String(v);
+    }
+
+    function subjectLabel(s) {
+      return s.no + " · " + (s.name || s.no);
+    }
+
+    function currentSubject() {
+      const id = document.getElementById("subjectSelect").value;
+      return REPORT.subjects.find(x => x.no === id) || REPORT.subjects[0];
+    }
+
+    function render() {
+      const s = currentSubject();
+      if (!s) return;
+      document.getElementById("modelBadge").textContent =
+        "當前採用模型：" + s.model + " · Group " + s.group;
+
+      const trustEl = document.getElementById("trustScoreText");
+      const trustBar = document.getElementById("trustBarFill");
+      const ts = s.trustScore;
+      if (ts === null || ts === undefined || ts === "") {
+        trustEl.textContent = "— / 10";
+        trustBar.style.width = "0%";
+      } else {
+        const n = Number(ts);
+        trustEl.textContent = n.toFixed(1) + " / 10";
+        const pct = Math.max(0, Math.min(100, ((n - 1) / 9) * 100));
+        trustBar.style.width = pct + "%";
+      }
+
+      const chart = document.getElementById("chartBox");
+      if (s.plotUrl) {
+        chart.innerHTML = '<img src="' + s.plotUrl + '" alt="Threshold plot" />';
+      } else {
+        chart.innerHTML = '<span class="empty">尚無 ' + s.model + ' 圖表（需執行 R 門檻）</span>';
+      }
+
+      document.getElementById("displayName").textContent = (s.name || s.no) + "（No. " + s.no + "）";
+
+      const rows = [
+        ["Heart Rate (HR)", fmt(s.thresholdHr, "bpm")],
+        ["Lactate (La)", s.thresholdLa != null ? fmt(s.thresholdLa, "la") : "—"],
+        ["Speed", fmt(s.thresholdSpeed, "kph")],
+      ];
+      document.getElementById("metricBody").innerHTML = rows
+        .map(r => "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>").join("");
+
+      const fb = document.getElementById("fileBars");
+      if (!s.topFiles || !s.topFiles.length) {
+        fb.innerHTML = '<p class="empty">無符合 ref～ref+3 bpm 的 ≥30 分鐘檔案</p>';
+      } else {
+        fb.innerHTML = s.topFiles.map((f, i) => {
+          const pct = Math.min(100, (f.durationMin / BAR_MAX_MIN) * 100);
+          return '<div class="file-row"><div class="label">' + (i+1) + '. ' + f.fileName +
+            ' · ' + f.durationMin + ' min · HR ' + fmt(f.avgHr, "bpm") + '</div>' +
+            '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+        }).join("") + '<div class="bar-scale"><span>0</span><span>30</span><span>60</span><span>90</span><span>120 min</span></div>';
+      }
+
+      document.getElementById("insightText").textContent = s.insight || "（無 narrative 段落）";
+    }
+
+    function initSelect() {
+      const sel = document.getElementById("subjectSelect");
+      sel.innerHTML = REPORT.subjects.map(s =>
+        '<option value="' + s.no + '">' + subjectLabel(s) + '</option>'
+      ).join("");
+    }
+
+    document.getElementById("subjectSelect").addEventListener("change", render);
+
+    initSelect();
+    render();
+  </script>
+</body>
+</html>
